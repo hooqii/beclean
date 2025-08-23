@@ -82,6 +82,7 @@ flutter:
     - assets/images/lock.png
     - assets/images/profile_1.png
     - assets/images/wallet.png
+    - assets/images/history.png
 
 flutter_launcher_icons:
   android: "launcher_icon" # Nama ikon di Android

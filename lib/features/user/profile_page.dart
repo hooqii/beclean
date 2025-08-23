@@ -1,6 +1,6 @@
 import 'package:beclean/core/config/app_colors.dart';
 import 'package:beclean/features/user/detail_account_user_page.dart';
-import 'package:beclean/features/user/manage_password_user_page.dart';
+import 'package:beclean/features/user/password_management_user.dart';
 import 'package:beclean/features/user/payment_account_page.dart';
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';

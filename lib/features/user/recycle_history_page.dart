@@ -1,62 +1,66 @@
 import 'package:flutter/material.dart';
 
-class ActivityPage extends StatelessWidget {
-  const ActivityPage({super.key});
+class HistoryPage extends StatelessWidget {
+  const HistoryPage({super.key});
+
+  // Data dummy history
+  final List<Map<String, dynamic>> _history = const [
+    {
+      "type": "Penjemputan",
+      "date": "21 Agustus 2025",
+      "status": "Diproses",
+      "weight": "5 Kg",
+      "saldo": "+Rp 50.000"
+    },
+    {
+      "type": "Penyetoran",
+      "date": "20 Agustus 2025",
+      "status": "Selesai",
+      "weight": "3 Kg",
+      "saldo": "+Rp 30.000"
+    },
+    {
+      "type": "Penjemputan",
+      "date": "18 Agustus 2025",
+      "status": "Dibatalkan",
+      "weight": "2 Kg",
+      "saldo": "+Rp 0"
+    },
+    {
+      "type": "Penjemputan",
+      "date": "17 Agustus 2025",
+      "status": "Selesai",
+      "weight": "2 Kg",
+      "saldo": "+Rp 20.000"
+    },
+  ];
+
+  IconData _getIcon(String type) {
+    if (type.contains("Penjemputan")) return Icons.local_shipping_outlined;
+    if (type.contains("Penyetoran")) return Icons.recycling_outlined;
+    return Icons.receipt_long_outlined;
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case "Selesai":
+        return Colors.green;
+      case "Diproses":
+        return Colors.orange;
+      case "Dibatalkan":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final history = [
-      {
-        'date': '01-08-2025',
-        'desc': 'Tarik Tunai',
-        'saldo': '-Rp 50.000',
-        'status': 'Proses',
-      },
-      {
-        'date': '28-07-2025',
-        'desc': 'Setor Sampah',
-        'saldo': '+Rp 20.000',
-        'status': 'Selesai',
-      },
-      {
-        'date': '25-07-2025',
-        'desc': 'Tarik Tunai',
-        'saldo': '-Rp 100.000',
-        'status': 'Selesai',
-      },
-      {
-        'date': '20-07-2025',
-        'desc': 'Setor Sampah',
-        'saldo': '+Rp 15.000',
-        'status': 'Selesai',
-      },
-    ];
-
-    IconData _getIcon(String desc) {
-      if (desc.contains("Tarik")) return Icons.account_balance_wallet_outlined;
-      if (desc.contains("Setor")) return Icons.recycling_outlined;
-      return Icons.receipt_long_outlined;
-    }
-
-    Color _getStatusColor(String status) {
-      switch (status) {
-        case "Proses":
-          return Colors.orange;
-        case "Selesai":
-          return Colors.green;
-        case "Gagal":
-          return Colors.red;
-        default:
-          return Colors.grey;
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         elevation: 0,
         title: const Text(
-          'Aktivitas Terkini',
+          'Riwayat Daur Ulang',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 23, 87, 14),
@@ -67,9 +71,9 @@ class ActivityPage extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: history.length,
+        itemCount: _history.length,
         itemBuilder: (context, index) {
-          final h = history[index];
+          final item = _history[index];
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -84,26 +88,27 @@ class ActivityPage extends StatelessWidget {
             child: ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
-                backgroundColor: _getStatusColor(h['status']!).withOpacity(0.1),
+                backgroundColor:
+                    _statusColor(item['status']!).withOpacity(0.1),
                 child: Icon(
-                  _getIcon(h['desc']!),
-                  color: _getStatusColor(h['status']!),
+                  _getIcon(item['type']!),
+                  color: _statusColor(item['status']!),
                 ),
               ),
               title: Text(
-                h['desc']!,
+                item['type']!,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(h['date']!), // sekarang hanya tanggal
+              subtitle: Text(item['date']!),
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    h['saldo']!,
+                    item['saldo']!,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: h['saldo']!.startsWith('-')
+                      color: item['saldo']!.startsWith('-')
                           ? Colors.red
                           : Colors.green,
                     ),
@@ -115,14 +120,14 @@ class ActivityPage extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(h['status']!).withOpacity(0.15),
+                      color: _statusColor(item['status']!).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      h['status']!,
+                      item['status']!,
                       style: TextStyle(
                         fontSize: 12,
-                        color: _getStatusColor(h['status']!),
+                        color: _statusColor(item['status']!),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -136,9 +141,7 @@ class ActivityPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    insetPadding: const EdgeInsets.all(
-                      16,
-                    ), // jarak dari tepi layar
+                    insetPadding: const EdgeInsets.all(16),
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -152,13 +155,13 @@ class ActivityPage extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                _getIcon(h['desc']!),
-                                color: _getStatusColor(h['status']!),
+                                _getIcon(item['type']!),
+                                color: _statusColor(item['status']!),
                                 size: 32,
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                h['desc']!,
+                                item['type']!,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -168,11 +171,15 @@ class ActivityPage extends StatelessWidget {
                           ),
                           const Divider(height: 24, thickness: 1),
                           Text(
-                            "Tanggal: ${h['date']}",
+                            "Tanggal: ${item['date']}",
                             style: const TextStyle(fontSize: 16),
                           ),
                           Text(
-                            "Jumlah: ${h['saldo']}",
+                            "Berat: ${item['weight']}",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            "Saldo: ${item['saldo']}",
                             style: const TextStyle(fontSize: 16),
                           ),
                           const SizedBox(height: 8),
@@ -182,16 +189,15 @@ class ActivityPage extends StatelessWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: _getStatusColor(
-                                h['status']!,
-                              ).withOpacity(0.15),
+                              color:
+                                  _statusColor(item['status']!).withOpacity(0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              h['status']!,
+                              item['status']!,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: _getStatusColor(h['status']!),
+                                color: _statusColor(item['status']!),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -202,12 +208,8 @@ class ActivityPage extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: () => Navigator.pop(context),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(
-                                  255,
-                                  23,
-                                  87,
-                                  14,
-                                ),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 23, 87, 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),

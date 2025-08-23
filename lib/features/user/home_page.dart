@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:beclean/features/user/detail_account_user_page.dart';
 import 'package:beclean/features/user/withdraw_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -83,10 +84,13 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
-      body: Stack(
-        children: [
-          Container(),
-          SingleChildScrollView(
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(), // biar lebih smooth
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: IntrinsicHeight(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -174,12 +178,11 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: _buildServiceMenuItem(
                               icon: Image.asset(
-                                'assets/images/location.png',
+                                'assets/images/history.png',
                                 width: 28,
                                 height: 28,
-                                // color: const Color.fromARGB(255, 23, 87, 14),
                               ),
-                              title: 'Alamat Penjemputan',
+                              title: 'Riwayat Daur Ulang',
                               onTap: () => Navigator.pushNamed(
                                 context,
                                 AppRoutes.pickupAddress,
@@ -209,7 +212,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -238,10 +241,20 @@ class _HomePageState extends State<HomePage> {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Color.fromARGB(255, 21, 56, 21),
-                    backgroundImage: AssetImage('assets/images/person.png'),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DetailAccountUserPage(),
+                        ),
+                      ); // arahkan ke halaman profile
+                    },
+                    child: const CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Color.fromARGB(255, 21, 56, 21),
+                      backgroundImage: AssetImage('assets/images/person.png'),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   const Expanded(
@@ -290,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Container(
                                   padding: const EdgeInsets.all(2),
                                   decoration: const BoxDecoration(
-                                    color: Color.fromARGB(255, 239, 73, 22),
+                                    // color: Color.fromARGB(255, 239, 73, 22),
                                     shape: BoxShape.circle,
                                   ),
                                   constraints: const BoxConstraints(

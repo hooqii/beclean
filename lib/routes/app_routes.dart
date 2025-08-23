@@ -8,7 +8,7 @@ import '../features/user/user_main_page.dart';
 import '../features/user/product_page.dart';
 import '../features/user/activity_page.dart';
 import '../features/user/profile_page.dart';
-import '../features/user/pickup_address_page.dart';
+import '../features/user/recycle_history_page.dart';
 import '../features/collector/dashboard_page.dart';
 import '../features/collector/pickup_page.dart';
 
@@ -36,7 +36,7 @@ class AppRoutes {
       productUser: (context) => const ProductPage(),
       activityUser: (context) => const ActivityPage(),
       profileUser: (context) => const ProfilePage(),
-      pickupAddress: (context) => const PickupAddress(),
+      pickupAddress: (context) => const HistoryPage(),
       dashboardCollector: (context) => const DashboardCollectorPage(),
       pickupCollector: (context) => const PickupPage(),
       pickupSchedule: (context) => const PickupSchedulePage(),
