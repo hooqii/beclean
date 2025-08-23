@@ -1,4 +1,7 @@
 import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/features/user/detail_account_user_page.dart';
+import 'package:beclean/features/user/manage_password_user_page.dart';
+import 'package:beclean/features/user/payment_account_page.dart';
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 
@@ -41,7 +44,17 @@ class ProfilePage extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Colors.grey),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DetailAccountUserPage(),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.chevron_right, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -71,7 +84,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                   text: "Detail Akun",
                   onTap: () {
-                    // Arahkan ke detail akun
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DetailAccountUserPage(),
+                      ),
+                    );
                   },
                 ),
                 // _divider(),
@@ -83,7 +101,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                   text: "Kelola Password",
                   onTap: () {
-                    // Arahkan ke ubah password
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ManagePasswordUserPage(),
+                      ),
+                    );
                   },
                 ),
                 // _divider(),
@@ -95,6 +118,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                   text: "Rekening Pembayaran",
                   onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PaymentAccountPage(),
+                      ),
+                    );
                     // Arahkan ke ubah password
                   },
                 ),

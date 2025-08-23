@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:beclean/features/user/withdraw_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../../routes/app_routes.dart';
@@ -329,7 +330,28 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WithdrawPage(
+                            accounts: [
+                              {
+                                "type": "Bank",
+                                "provider": "BCA",
+                                "number": "12345678",
+                              },
+                              {
+                                "type": "E-Wallet",
+                                "provider": "Dana",
+                                "number": "0812345678",
+                              },
+                            ],
+                            balance: 20000, // saldo user
+                          ),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white.withOpacity(0.35),
                       foregroundColor: Colors.white,

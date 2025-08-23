@@ -105,7 +105,7 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
                     child: Text(
                       'Tidak ada jadwal pickup untuk hari ini.',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 100, 100, 100),
+                        color: Color.fromARGB(255, 23, 87, 14),
                         fontSize: 14,
                       ),
                     ),
@@ -135,7 +135,7 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
                             events[index],
                             style: const TextStyle(
                               color: Color.fromARGB(255, 23, 87, 14),
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ),
