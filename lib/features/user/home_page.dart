@@ -178,10 +178,10 @@ class _HomePageState extends State<HomePage> {
                                 height: 28,
                                 // color: const Color.fromARGB(255, 23, 87, 14),
                               ),
-                              title: 'Request Pickup',
+                              title: 'Alamat Penjemputan',
                               onTap: () => Navigator.pushNamed(
                                 context,
-                                AppRoutes.requestPickupUser,
+                                AppRoutes.pickupAddress,
                               ),
                             ),
                           ),
@@ -396,7 +396,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildActiveScheduleCard(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.pickupSchedule);
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(

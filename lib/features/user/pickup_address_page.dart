@@ -2,19 +2,18 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/widgets/custom_button.dart';
 
-class RequestPickupPage extends StatefulWidget {
-  const RequestPickupPage({super.key});
+class PickupAddress extends StatefulWidget {
+  const PickupAddress({super.key});
 
   @override
-  State<RequestPickupPage> createState() => _RequestPickupPageState();
+  State<PickupAddress> createState() => _PickupAddressState();
 }
 
-class _RequestPickupPageState extends State<RequestPickupPage> {
+class _PickupAddressState extends State<PickupAddress> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedDusun;
   String? _selectedKampung;
   String? _selectedKecamatan;
-  final _noteController = TextEditingController();
   final _addressController = TextEditingController();
 
   final _dusunList = ['Dusun A', 'Dusun B', 'Dusun C'];
@@ -30,9 +29,9 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
 
   void _submitRequest() {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Request pickup terkirim')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Request pickup terkirim')));
       Navigator.pop(context);
     }
   }
@@ -43,7 +42,7 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          'Request Pickup',
+          'Alamat Penjemputan',
           style: TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
         ),
         centerTitle: true,
@@ -53,15 +52,6 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
       ),
       body: Stack(
         children: [
-          // Background sama seperti login
-          // Container(
-          //   decoration: const BoxDecoration(
-          //     image: DecorationImage(
-          //       image: AssetImage('assets/images/background.png'),
-          //       fit: BoxFit.cover,
-          //     ),
-          //   ),
-          // ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 90, 16, 16),
             child: Form(
@@ -69,16 +59,17 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
               child: ListView(
                 children: [
                   _buildGlassDropdown(
-                    hintText: "Pilih Dusun",
-                    value: _selectedDusun,
-                    items: _dusunList,
-                    onChanged: (val) => setState(() => _selectedDusun = val),
-                    validator: (val) => val == null ? 'Pilih dusun' : null,
-                    icon: Icons.home_outlined,
+                    hintText: "Pilih Kecamatan Yang Tersedia",
+                    value: _selectedKecamatan,
+                    items: _kecamatanList,
+                    onChanged: (val) =>
+                        setState(() => _selectedKecamatan = val),
+                    validator: (val) => val == null ? 'Pilih kecamatan' : null,
+                    icon: Icons.map_outlined,
                   ),
                   const SizedBox(height: 16),
                   _buildGlassDropdown(
-                    hintText: "Pilih Kampung",
+                    hintText: "Pilih Kampung Yang Tersedia",
                     value: _selectedKampung,
                     items: _kampungList,
                     onChanged: (val) => setState(() => _selectedKampung = val),
@@ -87,12 +78,12 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
                   ),
                   const SizedBox(height: 16),
                   _buildGlassDropdown(
-                    hintText: "Pilih Kecamatan",
-                    value: _selectedKecamatan,
-                    items: _kecamatanList,
-                    onChanged: (val) => setState(() => _selectedKecamatan = val),
-                    validator: (val) => val == null ? 'Pilih kecamatan' : null,
-                    icon: Icons.map_outlined,
+                    hintText: "Pilih Dusun Yang Tersedia",
+                    value: _selectedDusun,
+                    items: _dusunList,
+                    onChanged: (val) => setState(() => _selectedDusun = val),
+                    validator: (val) => val == null ? 'Pilih dusun' : null,
+                    icon: Icons.home_outlined,
                   ),
                   const SizedBox(height: 16),
                   _buildGlassTextField(
@@ -100,19 +91,16 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
                     hintText: 'Alamat Lengkap',
                     icon: Icons.location_on_outlined,
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.my_location, color: Color(0xFF164A2B)),
+                      icon: const Icon(
+                        Icons.my_location,
+                        color: Color(0xFF164A2B),
+                      ),
                       onPressed: _getCurrentLocation,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildGlassTextField(
-                    controller: _noteController,
-                    hintText: 'Catatan',
-                    icon: Icons.note_outlined,
-                  ),
                   const SizedBox(height: 24),
                   CustomButton(
-                    text: 'Kirim Request',
+                    text: 'Atur Alamat Penjemputan',
                     onPressed: _submitRequest,
                   ),
                 ],
@@ -140,12 +128,20 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
           color: Colors.white.withOpacity(0.2),
           child: DropdownButtonFormField<String>(
             value: value,
-            hint: Text(hintText, style: const TextStyle(color: Color(0xFF164A2B))),
+            hint: Text(
+              hintText,
+              style: const TextStyle(color: Color(0xFF164A2B)),
+            ),
             items: items
-                .map((e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e, style: const TextStyle(color: Color(0xFF164A2B))),
-                    ))
+                .map(
+                  (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e,
+                      style: const TextStyle(color: Color(0xFF164A2B)),
+                    ),
+                  ),
+                )
                 .toList(),
             onChanged: onChanged,
             validator: validator,
@@ -153,7 +149,10 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: Color.fromARGB(255, 23, 87, 14)),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
             ),
             dropdownColor: Colors.white.withOpacity(0.9),
           ),
@@ -183,9 +182,13 @@ class _RequestPickupPageState extends State<RequestPickupPage> {
               prefixIcon: Icon(icon, color: const Color(0xFF164A2B)),
               suffixIcon: suffixIcon,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
             ),
-            validator: (val) => val == null || val.isEmpty ? 'Harus diisi' : null,
+            validator: (val) =>
+                val == null || val.isEmpty ? 'Harus diisi' : null,
           ),
         ),
       ),
