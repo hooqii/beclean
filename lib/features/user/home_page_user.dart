@@ -468,7 +468,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Jadwal Aktif',
+                        'Jadwal pickup sampah',
                         style: TextStyle(
                           color: Color.fromARGB(255, 23, 87, 14),
                           fontWeight: FontWeight.bold,

@@ -1,3 +1,4 @@
+import 'package:beclean/features/collector/collector_history_page.dart';
 import 'package:beclean/features/user/pickup_schedule_page.dart';
 import 'package:flutter/material.dart';
 import '../features/onboarding/splash_screen.dart';
@@ -9,8 +10,8 @@ import '../features/user/product_page.dart';
 import '../features/user/activity_page.dart';
 import '../features/user/profile_page.dart';
 import '../features/user/recycle_history_page.dart';
-import '../features/collector/dashboard_page.dart';
-import '../features/collector/pickup_page.dart';
+import '../features/collector/home_page_collector.dart';
+import '../features/collector/pickup_list_page.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -22,9 +23,12 @@ class AppRoutes {
   static const activityUser = '/activity_user';
   static const profileUser = '/profile_user';
   static const pickupAddress = '/pickupAddress';
-  static const dashboardCollector = '/dashboard_collector';
+  static const homeCollector = '/home_collector';
   static const pickupCollector = '/pickup_collector';
   static const pickupSchedule = '/pickup_schedule';
+  static const userPickupList = '/user_pickup_list';
+  static const collectorHistory = '/collector_history';
+  static const inputWeight = '/input_weight';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -37,9 +41,10 @@ class AppRoutes {
       activityUser: (context) => const ActivityPage(),
       profileUser: (context) => const ProfilePage(),
       pickupAddress: (context) => const HistoryPage(),
-      dashboardCollector: (context) => const DashboardCollectorPage(),
-      pickupCollector: (context) => const PickupPage(),
+      homeCollector: (context) => const CollectorHomePage(),
       pickupSchedule: (context) => const PickupSchedulePage(),
+      userPickupList: (context) => const UserPickupListPage(),
+      collectorHistory: (context) => const CollectorHistoryPage(),
     };
   }
 }

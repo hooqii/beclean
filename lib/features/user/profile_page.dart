@@ -14,7 +14,6 @@ class ProfilePage extends StatelessWidget {
       body: ListView(
         children: [
           const SizedBox(height: 50),
-
           /// Bagian Header (Profile Info)
           Container(
             padding: const EdgeInsets.only(left: 24, right: 40, top: 16),
@@ -128,7 +127,6 @@ class ProfilePage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-
                 /// Tombol Logout
                 SizedBox(
                   width: double.infinity,
