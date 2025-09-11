@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class PickupSchedulePage extends StatefulWidget {
-  const PickupSchedulePage({super.key});
+class PickupSchedulePageUser extends StatefulWidget {
+  const PickupSchedulePageUser({super.key});
 
   @override
-  State<PickupSchedulePage> createState() => _PickupSchedulePageState();
+  State<PickupSchedulePageUser> createState() => _PickupSchedulePageUserState();
 }
 
-class _PickupSchedulePageState extends State<PickupSchedulePage> {
+class _PickupSchedulePageUserState extends State<PickupSchedulePageUser> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  // contoh data jadwal pickup
-  final Map<DateTime, List<String>> _pickupEvents = {
-    DateTime.utc(2025, 8, 23): ['Pickup Pagi - 09:00', 'Pickup Sore - 16:00'],
-    DateTime.utc(2025, 8, 25): ['Pickup Siang - 13:00'],
-    DateTime.utc(2025, 8, 30): ['Pickup Malam - 20:00'],
+  // contoh data jadwal pickup per orang
+  final Map<DateTime, List<Map<String, String>>> _pickupEvents = {
+    DateTime.utc(2025, 9, 13): [
+      {"name": "Steven Brenz", "time": "09:00"},
+      {"name": "Anna Putri", "time": "16:00"},
+    ],
+    DateTime.utc(2025, 9, 15): [
+      {"name": "Budi Santoso", "time": "13:00"},
+    ],
+    DateTime.utc(2025, 9, 17): [
+      {"name": "Dewi Lestari", "time": "20:00"},
+    ],
+    DateTime.utc(2025, 9, 20): [
+      {"name": "Steven Brenz", "time": "09:00"},
+      {"name": "Andi Wijaya", "time": "20:00"},
+    ],
   };
 
-  List<String> _getEventsForDay(DateTime day) {
+  List<Map<String, String>> _getEventsForDay(DateTime day) {
     return _pickupEvents[DateTime.utc(day.year, day.month, day.day)] ?? [];
   }
 
@@ -41,15 +52,14 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
       ),
       body: Column(
         children: [
+          // Kalender
           TableCalendar(
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            eventLoader: _getEventsForDay, // 👈 kasih event di tanggal yg ada
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            eventLoader: _getEventsForDay,
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
@@ -58,9 +68,7 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
             },
             onFormatChanged: (format) {
               if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
+                setState(() => _calendarFormat = format);
               }
             },
             onPageChanged: (focusedDay) {
@@ -83,21 +91,8 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
               outsideDaysVisible: false,
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          //   child: Align(
-          //     alignment: Alignment.center,
-          //     child: Text(
-          //       'Pukul Jadwal Pickup Hari Ini',
-          //       style: const TextStyle(
-          //         color: Color.fromARGB(255, 23, 87, 14),
-          //         fontWeight: FontWeight.bold,
-          //         fontSize: 16,
-          //       ),
-          //     ),
-          //   ),
-          // ),
           const SizedBox(height: 16),
+
           // List Jadwal di bawah kalender
           Expanded(
             child: events.isEmpty
@@ -113,8 +108,9 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
                 : ListView.builder(
                     itemCount: events.length,
                     itemBuilder: (context, index) {
+                      final item = events[index];
                       return Card(
-                        color: Colors.white,
+                        // color: Colors.white,
                         margin: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
@@ -128,14 +124,20 @@ class _PickupSchedulePageState extends State<PickupSchedulePage> {
                         ),
                         child: ListTile(
                           leading: const Icon(
-                            Icons.access_time,
+                            Icons.person,
                             color: Color.fromARGB(255, 23, 87, 14),
                           ),
                           title: Text(
-                            events[index],
+                            item["name"] ?? "",
                             style: const TextStyle(
                               color: Color.fromARGB(255, 23, 87, 14),
-                              fontWeight: FontWeight.w400,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "Jam Pickup: ${item["time"]}",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 23, 87, 14),
                             ),
                           ),
                         ),

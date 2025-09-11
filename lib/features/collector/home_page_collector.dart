@@ -4,7 +4,6 @@ import '../../routes/app_routes.dart';
 
 class CollectorHomePage extends StatelessWidget {
   const CollectorHomePage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,16 +44,13 @@ class CollectorHomePage extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
-
               // CARD: Jadwal Hari Ini
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: _buildScheduleCard(context),
               ),
               const SizedBox(height: 24),
-
               // MENU
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -79,7 +75,7 @@ class CollectorHomePage extends StatelessWidget {
                               width: 28,
                               height: 28,
                             ),
-                            title: 'Daftar User',
+                            title: 'Daftar\nPenjemputan',
                             onTap: () => Navigator.pushNamed(
                               context,
                               AppRoutes.userPickupList,
@@ -107,7 +103,6 @@ class CollectorHomePage extends StatelessWidget {
                   ],
                 ),
               ),
-
               // LIST JADWAL PENJEMPUTAN
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -124,8 +119,8 @@ class CollectorHomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _buildPickupList([
-                      'Pickup Pagi - 09:00',
-                      'Pickup Sore - 16:00',
+                      'Pukul - 09:00',
+                      'Pukul - 16:00',
                     ]),
                   ],
                 ),
@@ -194,7 +189,7 @@ class CollectorHomePage extends StatelessWidget {
   // CARD: Jadwal Hari Ini
   Widget _buildScheduleCard(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.pickupSchedule),
+      onTap: () => Navigator.pushNamed(context, AppRoutes.pickupScheduleCollector),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -234,7 +229,7 @@ class CollectorHomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    '10 Agustus 2025 - 08:00',
+                    '23 September 2025 - 08:00',
                     style: TextStyle(
                       color: Color.fromARGB(255, 83, 148, 14),
                       fontSize: 14,

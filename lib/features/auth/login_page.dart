@@ -111,15 +111,6 @@ class _LoginPageState extends State<LoginPage> {
                         isPrimary: true,
                       ),
                       const SizedBox(height: 12),
-                      // _buildGlassButton(
-                      //   onPressed: () {
-                      //     Navigator.pushReplacementNamed(
-                      //       context,
-                      //       AppRoutes.dashboardCollector,
-                      //     );
-                      //   },
-                      //   text: 'Login sebagai collector',
-                      // ),
                     ],
                   ),
                 ),

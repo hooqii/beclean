@@ -1,189 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class UserPickupListPage extends StatefulWidget {
-  const UserPickupListPage({super.key});
-
-  @override
-  State<UserPickupListPage> createState() => _UserPickupListPageState();
-}
-
-class _UserPickupListPageState extends State<UserPickupListPage> {
-  final List<Map<String, dynamic>> pickupList = [
-    {
-      "name": "Steven Brenz",
-      "address": "Jl. Merdeka No. 21",
-      "date": "20 Agustus 2025",
-      "time": "09:00",
-    },
-    {
-      "name": "Anna Putri",
-      "address": "Jl. Mawar No. 5",
-      "date": "19 Agustus 2025",
-      "time": "09:30",
-    },
-    {
-      "name": "Budi Santoso",
-      "address": "Jl. Kenanga No. 12",
-      "date": "20 Agustus 2025",
-      "time": "10:00",
-    },
-  ];
-
-  List<Map<String, dynamic>> filteredList = [];
-  final TextEditingController searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    filteredList = pickupList; // awalnya semua data tampil
-    searchController.addListener(_filterList);
-  }
-
-  void _filterList() {
-    String query = searchController.text.toLowerCase();
-    setState(() {
-      filteredList = pickupList.where((item) {
-        final name = item["name"].toString().toLowerCase();
-        final address = item["address"].toString().toLowerCase();
-        return name.contains(query) || address.contains(query);
-      }).toList();
-    });
-  }
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          "Daftar Penjemputan",
-          style: TextStyle(
-            color: Color.fromARGB(255, 23, 87, 14),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
-      ),
-      body: Column(
-        children: [
-          // 🔍 Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: "Cari nama atau alamat...",
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: Colors.grey,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 16,
-                ),
-              ),
-            ),
-          ),
-          // List hasil filter
-          Expanded(
-            child: filteredList.isEmpty
-                ? const Center(
-                    child: Text(
-                      "Tidak ada data yang cocok.",
-                      style: TextStyle(color: Colors.black54, fontSize: 14),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredList.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredList[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          // color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Color.fromARGB(255, 23, 87, 14),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: CircleAvatar(
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              23,
-                              87,
-                              14,
-                            ).withOpacity(0.1),
-                            child: const Icon(
-                              Icons.person,
-                              color: Color.fromARGB(255, 23, 87, 14),
-                            ),
-                          ),
-                          title: Text(
-                            item["name"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          subtitle: Text(
-                            "${item["address"]}\nJam: ${item["time"]}",
-                            style: const TextStyle(color: Colors.black54),
-                          ),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              _showInputWeightDialog(context, item["name"]);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                23,
-                                87,
-                                14,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                            ),
-                            child: const Text(
-                              "Proses",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 🗑 Dialog input berat (tetap sama dengan versi kamu sebelumnya)
-  void _showInputWeightDialog(BuildContext context, String userName) {
+/// 🔹 Helper class untuk dialog input berat sampah
+class PickupDialogHelper {
+  static void showInputWeightDialog(BuildContext context, String userName) {
     final TextEditingController totalWeightController = TextEditingController();
     final TextEditingController plastikController = TextEditingController();
     final TextEditingController kertasController = TextEditingController();
     final TextEditingController logamController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -196,9 +21,8 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
               double logam = double.tryParse(logamController.text) ?? 0;
               double total = plastik + kertas + logam;
               setState(() {
-                totalWeightController.text = total > 0
-                    ? total.toStringAsFixed(2)
-                    : "";
+                totalWeightController.text =
+                    total > 0 ? total.toStringAsFixed(2) : "";
               });
             }
 
@@ -240,7 +64,8 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
                           ),
                           Switch(
                             value: isOrganikOnly,
-                            activeColor: const Color.fromARGB(255, 23, 87, 14),
+                            activeColor:
+                                const Color.fromARGB(255, 23, 87, 14),
                             onChanged: (value) {
                               setState(() {
                                 isOrganikOnly = value;
@@ -271,12 +96,14 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
                             color: const Color.fromARGB(20, 23, 87, 14),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: const Color.fromARGB(255, 23, 87, 14),
+                              color:
+                                  const Color.fromARGB(255, 23, 87, 14),
                               width: 1,
                             ),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
                                 "Total Berat:",
@@ -333,9 +160,9 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
                     }
 
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(message)));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(message)),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 23, 87, 14),
@@ -356,7 +183,8 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
     );
   }
 
-  Widget _buildProductField(String label, TextEditingController controller) {
+  static Widget _buildProductField(
+      String label, TextEditingController controller) {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.number,
@@ -367,6 +195,175 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
           vertical: 12,
           horizontal: 16,
         ),
+      ),
+    );
+  }
+}
+
+/// 🔹 Page Kalender Jadwal Pickup
+class PickupSchedulePageCollector extends StatefulWidget {
+  const PickupSchedulePageCollector({super.key});
+
+  @override
+  State<PickupSchedulePageCollector> createState() =>
+      _PickupSchedulePageCollectorState();
+}
+
+class _PickupSchedulePageCollectorState
+    extends State<PickupSchedulePageCollector> {
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+
+  final Map<DateTime, List<Map<String, String>>> _pickupEvents = {
+    DateTime.utc(2025, 9, 13): [
+      {"name": "Steven Brenz", "time": "09:00"},
+      {"name": "Anna Putri", "time": "16:00"},
+    ],
+    DateTime.utc(2025, 9, 15): [
+      {"name": "Budi Santoso", "time": "13:00"},
+    ],
+    DateTime.utc(2025, 9, 17): [
+      {"name": "Dewi Lestari", "time": "20:00"},
+    ],
+    DateTime.utc(2025, 9, 20): [
+      {"name": "Steven Brenz", "time": "09:00"},
+      {"name": "Andi Wijaya", "time": "20:00"},
+    ],
+  };
+
+  List<Map<String, String>> _getEventsForDay(DateTime day) {
+    return _pickupEvents[DateTime.utc(day.year, day.month, day.day)] ?? [];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final events = _getEventsForDay(_selectedDay ?? _focusedDay);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Jadwal Pickup',
+          style: TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
+        ),
+        centerTitle: true,
+        iconTheme:
+            const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            eventLoader: _getEventsForDay,
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+            onFormatChanged: (format) {
+              if (_calendarFormat != format) {
+                setState(() => _calendarFormat = format);
+              }
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle:
+                  TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
+            ),
+            calendarStyle: const CalendarStyle(
+              selectedDecoration: BoxDecoration(
+                color: Color.fromARGB(255, 23, 87, 14),
+                shape: BoxShape.circle,
+              ),
+              todayDecoration: BoxDecoration(
+                color: Color.fromARGB(100, 23, 87, 14),
+                shape: BoxShape.circle,
+              ),
+              outsideDaysVisible: false,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: events.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Tidak ada jadwal pickup untuk hari ini.',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 23, 87, 14),
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      final item = events[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(
+                            color: Color.fromARGB(255, 23, 87, 14),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.person,
+                            color: Color.fromARGB(255, 23, 87, 14),
+                          ),
+                          title: Text(
+                            item["name"] ?? "",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 23, 87, 14),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            "Jam Pickup: ${item["time"]}",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 23, 87, 14),
+                            ),
+                          ),
+                          trailing: ElevatedButton(
+                            onPressed: () {
+                              PickupDialogHelper.showInputWeightDialog(
+                                  context, item["name"] ?? "");
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 23, 87, 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                            ),
+                            child: const Text(
+                              "Proses",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

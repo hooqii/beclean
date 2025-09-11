@@ -432,7 +432,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildActiveScheduleCard(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, AppRoutes.pickupSchedule);
+        Navigator.pushNamed(context, AppRoutes.pickupScheduleUser);
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
