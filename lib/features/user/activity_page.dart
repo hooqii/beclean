@@ -3,6 +3,25 @@ import 'package:flutter/material.dart';
 class ActivityPage extends StatelessWidget {
   const ActivityPage({super.key});
 
+  IconData _getIcon(String desc) {
+    if (desc.contains("Tarik")) return Icons.account_balance_wallet_outlined;
+    if (desc.contains("Setor")) return Icons.recycling_outlined;
+    return Icons.receipt_long_outlined;
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case "Proses":
+        return Colors.orange;
+      case "Selesai":
+        return Colors.green;
+      case "Gagal":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final history = [
@@ -31,25 +50,6 @@ class ActivityPage extends StatelessWidget {
         'status': 'Selesai',
       },
     ];
-
-    IconData _getIcon(String desc) {
-      if (desc.contains("Tarik")) return Icons.account_balance_wallet_outlined;
-      if (desc.contains("Setor")) return Icons.recycling_outlined;
-      return Icons.receipt_long_outlined;
-    }
-
-    Color _getStatusColor(String status) {
-      switch (status) {
-        case "Proses":
-          return Colors.orange;
-        case "Selesai":
-          return Colors.green;
-        case "Gagal":
-          return Colors.red;
-        default:
-          return Colors.grey;
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(

@@ -107,8 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, AppRoutes.login),
+                  onPressed: () => Navigator.pop(context),
                   child: const Text(
                     'Sudah punya akun? Login',
                     style: TextStyle(
