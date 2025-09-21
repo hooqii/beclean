@@ -1,23 +1,23 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'home_page_user.dart';
-import 'activity_page.dart';
-import 'profile_page.dart';
+import '../home/views/user_home_page.dart';
+import '../activity/views/activity_page.dart';
+import '../profile/views/profile_page.dart';
 // import 'product_page.dart';
 
-class UserMainPage extends StatefulWidget {
-  const UserMainPage({super.key});
+class UserLayout extends StatefulWidget {
+  const UserLayout({super.key});
 
   @override
-  State<UserMainPage> createState() => _UserMainPageState();
+  State<UserLayout> createState() => _UserLayoutState();
 }
 
-class _UserMainPageState extends State<UserMainPage> {
+class _UserLayoutState extends State<UserLayout> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
-    HomePage(),
+    UserHomePage(),
     // ProductPage(),
     ActivityPage(),
     ProfilePage(),
@@ -26,7 +26,7 @@ class _UserMainPageState extends State<UserMainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
+      // extendBody: true,
       body: _pages[_selectedIndex],
       bottomNavigationBar: ClipRRect(
         // borderRadius: const BorderRadius.only(

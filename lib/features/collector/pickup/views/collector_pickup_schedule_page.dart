@@ -21,8 +21,9 @@ class PickupDialogHelper {
               double logam = double.tryParse(logamController.text) ?? 0;
               double total = plastik + kertas + logam;
               setState(() {
-                totalWeightController.text =
-                    total > 0 ? total.toStringAsFixed(2) : "";
+                totalWeightController.text = total > 0
+                    ? total.toStringAsFixed(2)
+                    : "";
               });
             }
 
@@ -64,8 +65,7 @@ class PickupDialogHelper {
                           ),
                           Switch(
                             value: isOrganikOnly,
-                            activeColor:
-                                const Color.fromARGB(255, 23, 87, 14),
+                            activeColor: const Color.fromARGB(255, 23, 87, 14),
                             onChanged: (value) {
                               setState(() {
                                 isOrganikOnly = value;
@@ -96,14 +96,12 @@ class PickupDialogHelper {
                             color: const Color.fromARGB(20, 23, 87, 14),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color:
-                                  const Color.fromARGB(255, 23, 87, 14),
+                              color: const Color.fromARGB(255, 23, 87, 14),
                               width: 1,
                             ),
                           ),
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
                                 "Total Berat:",
@@ -184,7 +182,9 @@ class PickupDialogHelper {
   }
 
   static Widget _buildProductField(
-      String label, TextEditingController controller) {
+    String label,
+    TextEditingController controller,
+  ) {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.number,
@@ -201,16 +201,16 @@ class PickupDialogHelper {
 }
 
 /// 🔹 Page Kalender Jadwal Pickup
-class PickupSchedulePageCollector extends StatefulWidget {
-  const PickupSchedulePageCollector({super.key});
+class CollectorPickupSchedulePage extends StatefulWidget {
+  const CollectorPickupSchedulePage({super.key});
 
   @override
-  State<PickupSchedulePageCollector> createState() =>
-      _PickupSchedulePageCollectorState();
+  State<CollectorPickupSchedulePage> createState() =>
+      _CollectorPickupSchedulePageState();
 }
 
-class _PickupSchedulePageCollectorState
-    extends State<PickupSchedulePageCollector> {
+class _CollectorPickupSchedulePageState
+    extends State<CollectorPickupSchedulePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -247,8 +247,7 @@ class _PickupSchedulePageCollectorState
           style: TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
         ),
         centerTitle: true,
-        iconTheme:
-            const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
+        iconTheme: const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -278,8 +277,7 @@ class _PickupSchedulePageCollectorState
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
-              titleTextStyle:
-                  TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
+              titleTextStyle: TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
             ),
             calendarStyle: const CalendarStyle(
               selectedDecoration: BoxDecoration(
@@ -342,16 +340,24 @@ class _PickupSchedulePageCollectorState
                           trailing: ElevatedButton(
                             onPressed: () {
                               PickupDialogHelper.showInputWeightDialog(
-                                  context, item["name"] ?? "");
+                                context,
+                                item["name"] ?? "",
+                              );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 23, 87, 14),
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                23,
+                                87,
+                                14,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                             ),
                             child: const Text(
                               "Proses",

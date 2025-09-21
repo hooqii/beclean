@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class PickupSchedulePageUser extends StatefulWidget {
-  const PickupSchedulePageUser({super.key});
+class UserPickupSchedulePage extends StatefulWidget {
+  const UserPickupSchedulePage({super.key});
 
   @override
-  State<PickupSchedulePageUser> createState() => _PickupSchedulePageUserState();
+  State<UserPickupSchedulePage> createState() => _UserPickupSchedulePageState();
 }
 
-class _PickupSchedulePageUserState extends State<PickupSchedulePageUser> {
+class _UserPickupSchedulePageState extends State<UserPickupSchedulePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;

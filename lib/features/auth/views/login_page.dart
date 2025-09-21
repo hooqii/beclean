@@ -1,11 +1,11 @@
 import 'package:beclean/core/view_models/auth_view_model.dart';
-import 'package:beclean/features/auth/glass_button.dart';
-import 'package:beclean/features/auth/glass_container.dart';
-import 'package:beclean/features/auth/glass_text_field.dart';
+import 'package:beclean/features/auth/views/glass_button.dart';
+import 'package:beclean/features/auth/views/glass_container.dart';
+import 'package:beclean/features/auth/views/glass_text_field.dart';
 import 'package:beclean/shared/widgets/error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../routes/app_routes.dart';
+import '../../../routes/app_routes.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -1,18 +1,18 @@
 import 'dart:async';
-import 'package:beclean/features/user/detail_account_user_page.dart';
-import 'package:beclean/features/user/withdraw_page.dart';
+import 'package:beclean/features/user/profile/views/detail_account_user_page.dart';
+import 'package:beclean/features/user/withdraw/views/withdraw_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import '../../routes/app_routes.dart';
+import '../../../../routes/app_routes.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class UserHomePage extends StatefulWidget {
+  const UserHomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<UserHomePage> createState() => _UserHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _UserHomePageState extends State<UserHomePage> {
   final PageController _pageController = PageController(
     viewportFraction: 0.85,
     initialPage: 1,
