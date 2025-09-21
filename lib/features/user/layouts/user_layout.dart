@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../home/views/user_home_page.dart';
 import '../activity/views/activity_page.dart';
 import '../profile/views/profile_page.dart';
@@ -22,6 +24,14 @@ class _UserLayoutState extends State<UserLayout> {
     ActivityPage(),
     ProfilePage(),
   ];
+
+  void _changeIndex(int index) {
+    setState(() => _selectedIndex = index);
+
+    if (index == 2) {
+      context.read<AuthViewModel>().getProfile();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +60,7 @@ class _UserLayoutState extends State<UserLayout> {
               // unselectedItemColor: const Color.fromARGB(255, 15, 195, 30),
               showSelectedLabels: true, // sembunyikan label saat aktif
               showUnselectedLabels: false,
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
+              onTap: _changeIndex,
               backgroundColor: Colors.transparent,
               elevation: 0,
               type: BottomNavigationBarType.fixed,

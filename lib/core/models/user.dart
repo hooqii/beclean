@@ -1,3 +1,5 @@
+import 'package:beclean/core/models/payment_account.dart';
+
 class User {
   final String id;
   final String nik;
@@ -8,6 +10,7 @@ class User {
   final int saldo;
   final double latitude;
   final double longitude;
+  final List<PaymentAccount> rekening;
 
   User({
     required this.id,
@@ -19,9 +22,12 @@ class User {
     required this.saldo,
     required this.latitude,
     required this.longitude,
+    required this.rekening,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final rekening = json["rekening"] as List;
+
     return User(
       id: json["id"],
       nik: json["nik"],
@@ -32,6 +38,7 @@ class User {
       saldo: json["saldo"],
       latitude: json["latitude"],
       longitude: json["longitude"],
+      rekening: rekening.map((e) => PaymentAccount.fromJson(e)).toList(),
     );
   }
 }

@@ -1,7 +1,10 @@
 import 'package:beclean/features/collector/history/views/collector_history_page.dart';
 import 'package:beclean/features/collector/pickup/views/collector_pickup_schedule_page.dart';
 import 'package:beclean/features/user/pickup_schedule/views/user_pickup_schedule_page.dart';
+import 'package:beclean/features/user/profile/view_models/payment_account_view_model.dart';
+import 'package:beclean/features/user/profile/views/payment_account_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../features/onboarding/splash_screen.dart';
 // import '../features/onboarding/onboarding_page.dart';
 import '../features/auth/views/login_page.dart';
@@ -33,6 +36,7 @@ class AppRoutes {
   static const userPickupList = '/user_pickup_list';
   static const collectorHistory = '/collector_history';
   static const inputWeight = '/input_weight';
+  static const paymentAccount = '/payment_account';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -49,6 +53,12 @@ class AppRoutes {
       pickupScheduleCollector: (context) => const CollectorPickupSchedulePage(),
       userPickupList: (context) => const UserPickupListPage(),
       collectorHistory: (context) => const CollectorHistoryPage(),
+      paymentAccount: (context) {
+        return ChangeNotifierProvider(
+          create: (context) => PaymentAccountViewModel(),
+          child: const PaymentAccountPage(),
+        );
+      },
     };
   }
 }

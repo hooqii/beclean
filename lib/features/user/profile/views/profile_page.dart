@@ -2,7 +2,6 @@ import 'package:beclean/core/config/app_colors.dart';
 import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:beclean/features/user/profile/views/detail_account_user_page.dart';
 import 'package:beclean/features/user/profile/views/password_management_user.dart';
-import 'package:beclean/features/user/profile/views/payment_account_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../routes/app_routes.dart';
@@ -139,12 +138,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     text: "Rekening Pembayaran",
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PaymentAccountPage(),
-                        ),
-                      );
+                      Navigator.pushNamed(context, AppRoutes.paymentAccount);
                       // Arahkan ke ubah password
                     },
                   ),
