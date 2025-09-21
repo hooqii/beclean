@@ -1,5 +1,7 @@
+import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
 import 'core/config/app_colors.dart';
 
@@ -15,7 +17,7 @@ void main() {
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarIconBrightness: Brightness.light,
       systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarContrastEnforced: true
+      systemNavigationBarContrastEnforced: true,
     ),
   );
 
@@ -27,15 +29,20 @@ class BeCleanApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BeClean',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthViewModel()),
+      ],
+      child: MaterialApp(
+        title: 'BeClean',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+          useMaterial3: true,
+        ),
+        initialRoute: AppRoutes.splash,
+        routes: AppRoutes.getRoutes(),
       ),
-      initialRoute: AppRoutes.splash,
-      routes: AppRoutes.getRoutes(),
     );
   }
 }

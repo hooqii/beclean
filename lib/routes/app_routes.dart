@@ -15,6 +15,8 @@ import '../features/collector/home_page_collector.dart';
 import '../features/collector/pickup_list_page.dart';
 
 class AppRoutes {
+  AppRoutes._();
+
   static const splash = '/';
   // static const onboarding = '/onboarding';
   static const login = '/login';
