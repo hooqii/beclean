@@ -4,6 +4,7 @@ import 'package:beclean/features/auth/glass_container.dart';
 import 'package:beclean/features/auth/glass_text_field.dart';
 import 'package:beclean/features/auth/models/new_user.dart';
 import 'package:beclean/routes/app_routes.dart';
+import 'package:beclean/shared/widgets/error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -176,10 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 GlassContainer(
                   child: Column(
                     children: [
-                      Text(
-                        _error ?? "",
-                        style: TextStyle(color: Colors.red.shade800),
-                      ),
+                      ErrorView(error: _error),
                       SizedBox(height: 8),
                       GlassTextField(
                         controller: _nikController,

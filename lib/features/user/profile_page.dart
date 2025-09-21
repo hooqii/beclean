@@ -1,12 +1,23 @@
 import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:beclean/features/user/detail_account_user_page.dart';
 import 'package:beclean/features/user/password_management_user.dart';
 import 'package:beclean/features/user/payment_account_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../routes/app_routes.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
+  void _logout(BuildContext context) {
+    context.read<AuthViewModel>().logout();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.login,
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,13 +152,7 @@ class ProfilePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.login,
-                        (route) => false,
-                      );
-                    },
+                    onPressed: () => _logout(context),
                     child: const Text(
                       "Logout",
                       style: TextStyle(

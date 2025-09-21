@@ -1,6 +1,10 @@
-import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/features/auth/glass_button.dart';
+import 'package:beclean/features/auth/glass_container.dart';
+import 'package:beclean/features/auth/glass_text_field.dart';
+import 'package:beclean/shared/widgets/error_view.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import 'package:provider/provider.dart';
 import '../../routes/app_routes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,21 +15,51 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  bool _isPasswordObscured = true;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _loading = false;
+  String? _error;
+
+  void _login() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    final authVM = context.read<AuthViewModel>();
+    final navigator = Navigator.of(context);
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final error = await authVM.login(email, password);
+
+    if (error == null) {
+      final role = authVM.role;
+      final route = role == "user"
+          ? AppRoutes.homeUser
+          : AppRoutes.homeCollector;
+      navigator.pushNamedAndRemoveUntil(route, (route) => false);
+      return;
+    }
+
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
+  }
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       // 1. Gunakan Stack untuk menumpuk background dan konten
       body: Stack(
@@ -66,57 +100,37 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 25),
                 // Card Glassmorphism untuk form
-                _buildGlassContainer(
+                GlassContainer(
                   child: Column(
                     children: [
-                      _buildGlassTextField(
-                        controller: emailController,
+                      ErrorView(error: _error),
+                      GlassTextField(
+                        controller: _emailController,
                         hintText: 'Email',
                         icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
                       ),
                       const SizedBox(height: 16),
-                      _buildGlassTextField(
-                        controller: passwordController,
+                      GlassTextField(
+                        controller: _passwordController,
                         hintText: 'Password',
                         icon: Icons.lock_outline,
-                        obscureText: _isPasswordObscured,
-                        suffixIcon: Padding(
-                          // Atur jarak kanan ikon di sini.
-                          // Semakin besar nilainya, semakin jauh ikon dari tepi kanan.
-                          padding: const EdgeInsets.only(right: 2.0),
-                          child: IconButton(
-                            icon: Icon(
-                              _isPasswordObscured
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordObscured = !_isPasswordObscured;
-                              });
-                            },
-                          ),
-                        ),
+                        isPassword: true,
                       ),
                       const SizedBox(height: 24),
-                      _buildGlassButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            AppRoutes.homeUser,
-                          );
-                        },
+                      GlassButton(
+                        onPressed: _login,
                         text: 'Masuk',
-                        isPrimary: true,
+                        loading: _loading,
                       ),
                       const SizedBox(height: 12),
                     ],
                   ),
                 ),
                 TextButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, AppRoutes.register),
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.register);
+                  },
                   child: const Text(
                     'Belum punya akun? Register',
                     style: TextStyle(
@@ -129,109 +143,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // Helper widget untuk container glassmorphism utama
-  Widget _buildGlassContainer({required Widget child}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(25.0),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-        child: Container(
-          padding: const EdgeInsets.only(
-            left: 20.0,
-            right: 20.0,
-            top: 45.0,
-            bottom: 45.0,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(25.0),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1.5,
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  // Helper widget untuk TextField dengan efek glass
-  Widget _buildGlassTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    bool obscureText = false,
-    Widget? suffixIcon,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15.0),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-        child: Container(
-          color: Colors.white.withOpacity(0.2),
-          child: TextField(
-            controller: controller,
-            obscureText: obscureText,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(color: Colors.white),
-              prefixIcon: Icon(icon, color: Colors.white),
-              suffixIcon: suffixIcon,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 15,
-                horizontal: 20,
-              ),
-            ),
-            keyboardType: obscureText
-                ? TextInputType.visiblePassword
-                : TextInputType.emailAddress,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Helper widget untuk Button dengan efek glass
-  Widget _buildGlassButton({
-    required VoidCallback onPressed,
-    required String text,
-    bool isPrimary = false,
-  }) {
-    return SizedBox(
-      height: 50,
-      width: double.infinity,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-          child: ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isPrimary
-                  ? AppColors.primary.withOpacity(0.9)
-                  : Colors.white.withOpacity(0.25),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                // borderRadius: BorderRadius.circular(99),
-                side: isPrimary
-                    ? BorderSide.none
-                    : BorderSide(color: Colors.white.withOpacity(0.5)),
-              ),
-              shadowColor: Colors.transparent,
-            ),
-            child: Text(
-              text,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
       ),
     );
   }

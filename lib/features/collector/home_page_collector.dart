@@ -1,9 +1,21 @@
 import 'dart:ui';
+import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../routes/app_routes.dart';
 
 class CollectorHomePage extends StatelessWidget {
   const CollectorHomePage({super.key});
+
+  void _logout(BuildContext context) {
+    context.read<AuthViewModel>().logout();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.login,
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,9 +186,7 @@ class CollectorHomePage extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, AppRoutes.login);
-                },
+                onPressed: () => _logout(context),
                 icon: const Icon(Icons.logout, color: Colors.white),
               ),
             ],
@@ -189,7 +199,9 @@ class CollectorHomePage extends StatelessWidget {
   // CARD: Jadwal Hari Ini
   Widget _buildScheduleCard(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.pickupScheduleCollector),
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.pickupScheduleCollector);
+      },
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
