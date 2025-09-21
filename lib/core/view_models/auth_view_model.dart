@@ -5,6 +5,7 @@ import 'package:beclean/core/models/collector.dart';
 import 'package:beclean/core/models/user.dart';
 import 'package:beclean/core/services/api_service.dart';
 import 'package:beclean/features/auth/models/new_user.dart';
+import 'package:beclean/features/user/profile/models/account_details.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -95,7 +96,7 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<Collector> getCollectorProfile() async {
     try {
-      final endpoint = "${ApiService.baseUrl}/driver/profile";
+      const endpoint = "${ApiService.baseUrl}/driver/profile";
       final response = await ApiService.getRequest(endpoint);
       if (response.statusCode < 300) {
         final collector = Collector.fromJson(response.data);
@@ -130,6 +131,25 @@ class AuthViewModel extends ChangeNotifier {
     } catch (e, stacktrace) {
       log("Failed to load profile: $e", stackTrace: stacktrace);
       return false;
+    }
+  }
+
+  Future<String?> updateProfil(AccountDetails account) async {
+    try {
+      final response = await ApiService.putRequest(
+        "$_endpoint/profile",
+        body: account.toJson(),
+      );
+      if (response.statusCode < 300) {
+        final json = response.data;
+        _currentUser = User.fromJson(json);
+        notifyListeners();
+        return null;
+      }
+      throw Exception(response.message);
+    } catch (e, stacktrace) {
+      log("Failed to update profile: $e", stackTrace: stacktrace);
+      return "Terjadi kesalahan";
     }
   }
 

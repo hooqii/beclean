@@ -5,6 +5,7 @@ class User {
   final String nama;
   final String noHp;
   final String alamat;
+  final int saldo;
   final double latitude;
   final double longitude;
 
@@ -15,6 +16,7 @@ class User {
     required this.nama,
     required this.noHp,
     required this.alamat,
+    required this.saldo,
     required this.latitude,
     required this.longitude,
   });
@@ -27,6 +29,7 @@ class User {
       nama: json["nama"],
       noHp: json["noHp"],
       alamat: json["alamat"],
+      saldo: json["saldo"],
       latitude: json["latitude"],
       longitude: json["longitude"],
     );

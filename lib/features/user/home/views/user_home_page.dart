@@ -1,81 +1,18 @@
-import 'dart:async';
+import 'package:beclean/core/utils/app_helpers.dart';
+import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/features/user/home/views/home_carousel.dart';
 import 'package:beclean/features/user/profile/views/detail_account_user_page.dart';
 import 'package:beclean/features/user/withdraw/views/withdraw_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../../../../routes/app_routes.dart';
 
-class UserHomePage extends StatefulWidget {
+class UserHomePage extends StatelessWidget {
   const UserHomePage({super.key});
 
   @override
-  State<UserHomePage> createState() => _UserHomePageState();
-}
-
-class _UserHomePageState extends State<UserHomePage> {
-  final PageController _pageController = PageController(
-    viewportFraction: 0.85,
-    initialPage: 1,
-  );
-  Timer? _timer;
-  int _currentPage = 0;
-
-  final List<Map<String, dynamic>> _carouselItems = [
-    {"image": "assets/images/carousel.png", "color": Colors.white},
-    {"image": "assets/images/carousel_1.png", "color": Colors.white},
-    {"image": "assets/images/carousel_2.png", "color": Colors.white},
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _startAutoSlide();
-  }
-
-  void _startAutoSlide() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_pageController.hasClients) {
-        int nextPage = _pageController.page!.round() + 1;
-        _pageController.animateToPage(
-          nextPage,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
-  void _onPageChanged(int index) {
-    if (index == 0) {
-      setState(() {
-        _currentPage = _carouselItems.length - 1;
-      });
-    } else if (index == _carouselItems.length + 1) {
-      setState(() {
-        _currentPage = 0;
-      });
-    } else {
-      setState(() {
-        _currentPage = index - 1;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> loopItems = [
-      _carouselItems.last,
-      ..._carouselItems,
-      _carouselItems.first,
-    ];
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
@@ -120,41 +57,7 @@ class _UserHomePageState extends State<UserHomePage> {
                 const SizedBox(height: 16),
 
                 // CAROUSEL
-                SizedBox(
-                  height: 150,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: loopItems.length,
-                    onPageChanged: (index) {
-                      if (index == 0) {
-                        Future.delayed(Duration.zero, () {
-                          _pageController.jumpToPage(_carouselItems.length);
-                        });
-                      } else if (index == loopItems.length - 1) {
-                        Future.delayed(Duration.zero, () {
-                          _pageController.jumpToPage(1);
-                        });
-                      }
-                      _onPageChanged(index);
-                    },
-                    itemBuilder: (context, index) {
-                      final item = loopItems[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRoutes.productUser);
-                        },
-                        child: _buildCarouselCard(
-                          imagePath: item["image"],
-                          bgColor: item["color"],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-                _buildDotIndicator(),
-                const SizedBox(height: 24),
+                const HomeCarousel(),
 
                 // MENU
                 Padding(
@@ -218,6 +121,9 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final user = context.watch<AuthViewModel>().currentUser!;
+    final saldo = AppHelpers.formatHarga(user.saldo);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -257,14 +163,17 @@ class _UserHomePageState extends State<UserHomePage> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Halo,', style: TextStyle(color: Colors.white70)),
+                        const Text(
+                          'Halo,',
+                          style: const TextStyle(color: Colors.white70),
+                        ),
                         Text(
-                          'Steven Brenz',
-                          style: TextStyle(
+                          user.nama,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -273,67 +182,67 @@ class _UserHomePageState extends State<UserHomePage> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 45,
-                    height: 45,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(22.5),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/images/notification.png',
-                                width: 24,
-                                height: 24,
-                              ),
-                              Positioned(
-                                right: 8,
-                                top: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: const BoxDecoration(
-                                    // color: Color.fromARGB(255, 239, 73, 22),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 12,
-                                    minHeight: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 45,
+                  //   height: 45,
+                  //   child: ClipRRect(
+                  //     borderRadius: BorderRadius.circular(22.5),
+                  //     child: BackdropFilter(
+                  //       filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                  //       child: Container(
+                  //         decoration: BoxDecoration(
+                  //           color: Colors.white.withOpacity(0.2),
+                  //           shape: BoxShape.circle,
+                  //           border: Border.all(
+                  //             color: Colors.white.withOpacity(0.3),
+                  //             width: 1,
+                  //           ),
+                  //         ),
+                  //         child: Stack(
+                  //           alignment: Alignment.center,
+                  //           children: [
+                  //             Image.asset(
+                  //               'assets/images/notification.png',
+                  //               width: 24,
+                  //               height: 24,
+                  //             ),
+                  //             Positioned(
+                  //               right: 8,
+                  //               top: 8,
+                  //               child: Container(
+                  //                 padding: const EdgeInsets.all(2),
+                  //                 decoration: const BoxDecoration(
+                  //                   // color: Color.fromARGB(255, 239, 73, 22),
+                  //                   shape: BoxShape.circle,
+                  //                 ),
+                  //                 constraints: const BoxConstraints(
+                  //                   minWidth: 12,
+                  //                   minHeight: 12,
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(height: 25),
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Saldo Anda',
                           style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                         Text(
-                          'Rp. 20.000',
-                          style: TextStyle(
+                          saldo,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -347,7 +256,7 @@ class _UserHomePageState extends State<UserHomePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WithdrawPage(
+                          builder: (context) => const WithdrawPage(
                             accounts: [
                               {
                                 "type": "Bank",
@@ -384,48 +293,6 @@ class _UserHomePageState extends State<UserHomePage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildCarouselCard({
-    required String imagePath,
-    required Color bgColor,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color.fromARGB(255, 47, 124, 40),
-          width: 1,
-        ),
-        image: DecorationImage(
-          image: AssetImage(imagePath),
-          fit: BoxFit.cover,
-          opacity: 0.85,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDotIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(_carouselItems.length, (index) {
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          height: 8,
-          width: _currentPage == index ? 24 : 8,
-          decoration: BoxDecoration(
-            color: _currentPage == index
-                ? const Color.fromARGB(255, 23, 87, 14)
-                : Colors.grey,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        );
-      }),
     );
   }
 

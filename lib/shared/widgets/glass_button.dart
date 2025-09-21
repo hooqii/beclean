@@ -31,7 +31,7 @@ class GlassButton extends StatelessWidget {
                   ? AppColors.primary.withAlpha(125)
                   : AppColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(side: BorderSide.none),
+              shape: const RoundedRectangleBorder(side: BorderSide.none),
               shadowColor: Colors.transparent,
             ),
             child: Text(

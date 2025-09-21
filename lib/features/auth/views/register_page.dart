@@ -1,5 +1,5 @@
 import 'package:beclean/core/view_models/auth_view_model.dart';
-import 'package:beclean/features/auth/views/glass_button.dart';
+import 'package:beclean/shared/widgets/glass_button.dart';
 import 'package:beclean/features/auth/views/glass_container.dart';
 import 'package:beclean/features/auth/views/glass_text_field.dart';
 import 'package:beclean/features/auth/models/new_user.dart';
@@ -38,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (position == null) {
       messenger.showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Gagal mengambil lokasi"),
         ),
       );
@@ -178,7 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     children: [
                       ErrorView(error: _error),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       GlassTextField(
                         controller: _nikController,
                         hintText: 'NIK',

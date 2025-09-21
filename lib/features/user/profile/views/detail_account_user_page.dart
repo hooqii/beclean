@@ -1,5 +1,10 @@
+import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/features/user/profile/models/account_details.dart';
+import 'package:beclean/shared/widgets/error_view.dart';
+import 'package:beclean/shared/widgets/glass_button.dart';
 import 'package:flutter/material.dart';
 import 'package:beclean/core/config/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class DetailAccountUserPage extends StatefulWidget {
   const DetailAccountUserPage({super.key});
@@ -9,15 +14,97 @@ class DetailAccountUserPage extends StatefulWidget {
 }
 
 class _DetailAccountUserPageState extends State<DetailAccountUserPage> {
-  final TextEditingController _usernameController = TextEditingController(
-    text: "Steven Brenz",
-  );
-  final TextEditingController _emailController = TextEditingController(
-    text: "steven@email.com",
-  );
-  final TextEditingController _phoneController = TextEditingController(
-    text: "+62 812 3456 7890",
-  );
+  final _namaController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _nikController = TextEditingController();
+  final _alamatController = TextEditingController();
+
+  bool _loading = false;
+  String? _error;
+
+  void _loadTexts() {
+    final user = context.read<AuthViewModel>().currentUser!;
+    _namaController.text = user.nama;
+    _emailController.text = user.email;
+    _phoneController.text = user.noHp;
+    _nikController.text = user.nik;
+    _alamatController.text = user.alamat;
+  }
+
+  void _updateProfile() async {
+    if (!_validate()) return;
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    final account = AccountDetails(
+      nik: _nikController.text.trim(),
+      nama: _namaController.text.trim(),
+      email: _emailController.text.trim(),
+      noHp: _phoneController.text.trim(),
+      alamat: _alamatController.text.trim(),
+    );
+
+    final error = await context.read<AuthViewModel>().updateProfil(account);
+    if (error == null) {
+      navigator.pop();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text("Berhasil update profil"),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      return;
+    }
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
+  }
+
+  bool _validate() {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    if (_alamatController.text.isEmpty) {
+      _error = "Alamat tidak boleh kosong";
+    }
+    if (_phoneController.text.isEmpty) {
+      _error = "Nomor handphone tidak boleh kosong";
+    }
+    if (_emailController.text.isEmpty) {
+      _error = "Email tidak boleh kosong";
+    }
+    if (_namaController.text.isEmpty) {
+      _error = "Nama tidak boleh kosong";
+    }
+    if (_nikController.text.isEmpty) {
+      _error = "NIK tidak boleh kosong";
+    }
+    if (_error != null) {
+      setState(() => _loading = false);
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTexts();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _namaController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _nikController.dispose();
+    _alamatController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,45 +127,35 @@ class _DetailAccountUserPageState extends State<DetailAccountUserPage> {
             const SizedBox(height: 16),
 
             /// Foto Profile
-            GestureDetector(
-              onTap: () {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(content: Text("Edit foto profile diklik")),
-                // );
-              },
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  const CircleAvatar(
-                    radius: 60,
-                    backgroundImage: AssetImage('assets/images/profile.png'),
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(6),
-                    child: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
+            const CircleAvatar(
+              radius: 60,
+              backgroundImage: AssetImage('assets/images/profile.png'),
             ),
             const SizedBox(height: 36),
+
+            /// Error View
+            ErrorView(error: _error),
+
+            /// NIK
+            _AccountTextField(
+              controller: _nikController,
+              label: "NIK",
+              icon: Icons.assignment_ind_outlined,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 18),
+
             /// Username
-            _buildTextField(
-              controller: _usernameController,
-              label: "Username",
+            _AccountTextField(
+              controller: _namaController,
+              label: "Nama",
               icon: Icons.person,
+              keyboardType: TextInputType.name,
             ),
             const SizedBox(height: 18),
 
             /// Email
-            _buildTextField(
+            _AccountTextField(
               controller: _emailController,
               label: "Email",
               icon: Icons.email,
@@ -87,7 +164,7 @@ class _DetailAccountUserPageState extends State<DetailAccountUserPage> {
             const SizedBox(height: 18),
 
             /// Nomor HP
-            _buildTextField(
+            _AccountTextField(
               controller: _phoneController,
               label: "Nomor HP",
               icon: Icons.phone,
@@ -95,46 +172,42 @@ class _DetailAccountUserPageState extends State<DetailAccountUserPage> {
             ),
             const SizedBox(height: 30),
 
+            /// Alamat
+            _AccountTextField(
+              controller: _alamatController,
+              label: "Alamat",
+              icon: Icons.location_on,
+            ),
+            const SizedBox(height: 30),
+
             /// Tombol Simpan
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  // TODO: Simpan perubahan ke backend / local state
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Perubahan disimpan")),
-                  );
-                },
-                child: const Text(
-                  "Simpan Perubahan",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            GlassButton(
+              onPressed: _updateProfile,
+              text: "Simpan Perubahan",
+              loading: _loading,
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  /// Custom TextField Builder
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
+class _AccountTextField extends StatelessWidget {
+  const _AccountTextField({
+    required this.controller,
+    required this.label,
+    required this.icon,
+    this.keyboardType,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final IconData icon;
+  final TextInputType? keyboardType;
+
+  @override
+  Widget build(BuildContext context) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
@@ -154,7 +227,7 @@ class _DetailAccountUserPageState extends State<DetailAccountUserPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );
