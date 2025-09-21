@@ -1,5 +1,9 @@
+import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/shared/widgets/error_view.dart';
+import 'package:beclean/shared/widgets/glass_button.dart';
 import 'package:flutter/material.dart';
 import 'package:beclean/core/config/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class ManagePasswordUserPage extends StatefulWidget {
   const ManagePasswordUserPage({super.key});
@@ -14,12 +18,56 @@ class _ManagePasswordUserPageState extends State<ManagePasswordUserPage> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  bool _obscureOld = true;
-  bool _obscureNew = true;
-  bool _obscureConfirm = true;
+  bool _loading = false;
+  String? _error;
+
+  String? _newPassValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Password baru tidak boleh kosong";
+    }
+    if (_newPasswordController.text != _confirmPasswordController.text) {
+      return "Kedua password tidak sama";
+    }
+    return null;
+  }
+
+  void _updatePassword() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    final oldPassword = _oldPasswordController.text;
+    final newPassword = _newPasswordController.text;
+    final error = await context.read<AuthViewModel>().updatePassword(
+      oldPassword,
+      newPassword,
+    );
+
+    if (error == null) {
+      navigator.pop();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text("Password berhasil diperbarui"),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      return;
+    }
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final nama = context.read<AuthViewModel>().currentUser!.nama;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -41,9 +89,9 @@ class _ManagePasswordUserPageState extends State<ManagePasswordUserPage> {
               backgroundImage: AssetImage("assets/images/profile.png"),
             ),
             const SizedBox(height: 16),
-            const Text(
-              "Steven Brenz",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Text(
+              nama,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 30),
 
@@ -52,68 +100,31 @@ class _ManagePasswordUserPageState extends State<ManagePasswordUserPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  _buildPasswordField(
+                  ErrorView(error: _error),
+                  const SizedBox(height: 8),
+                  _PasswordField(
                     controller: _oldPasswordController,
                     label: "Password Lama",
-                    obscure: _obscureOld,
-                    toggle: () => setState(() => _obscureOld = !_obscureOld),
                   ),
                   const SizedBox(height: 16),
-                  _buildPasswordField(
+                  _PasswordField(
                     controller: _newPasswordController,
                     label: "Password Baru",
-                    obscure: _obscureNew,
-                    toggle: () => setState(() => _obscureNew = !_obscureNew),
+                    validator: _newPassValidator,
                   ),
                   const SizedBox(height: 16),
-                  _buildPasswordField(
+                  _PasswordField(
                     controller: _confirmPasswordController,
-                    label: "Konfirmasi Password",
-                    obscure: _obscureConfirm,
-                    toggle: () =>
-                        setState(() => _obscureConfirm = !_obscureConfirm),
+                    label: "Konfirmasi Password Baru",
+                    validator: _newPassValidator,
                   ),
                   const SizedBox(height: 30),
 
                   /// Tombol Simpan
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_newPasswordController.text !=
-                              _confirmPasswordController.text) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Konfirmasi password tidak cocok",
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          } else {
-                            // TODO: Integrasikan ke backend update password
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Password berhasil diperbarui"),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      child: const Text(
-                        "Update Password",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
+                  GlassButton(
+                    onPressed: _updatePassword,
+                    text: "Update Password",
+                    loading: _loading,
                   ),
                 ],
               ),
@@ -123,29 +134,49 @@ class _ManagePasswordUserPageState extends State<ManagePasswordUserPage> {
       ),
     );
   }
+}
 
-  /// Widget Reusable untuk field password
-  Widget _buildPasswordField({
-    required TextEditingController controller,
-    required String label,
-    required bool obscure,
-    required VoidCallback toggle,
-  }) {
+class _PasswordField extends StatefulWidget {
+  const _PasswordField({
+    required this.controller,
+    required this.label,
+    this.validator,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final String? Function(String? value)? validator;
+
+  @override
+  State<_PasswordField> createState() => __PasswordFieldState();
+}
+
+class __PasswordFieldState extends State<_PasswordField> {
+  bool _show = false;
+
+  void _toggle() {
+    setState(() => _show = !_show);
+  }
+
+  String? _validator(String? value) {
+    if (value == null || value.isEmpty) {
+      return "${widget.label} tidak boleh kosong";
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "$label wajib diisi";
-        }
-        return null;
-      },
+      controller: widget.controller,
+      obscureText: !_show,
+      validator: widget.validator ?? _validator,
       decoration: InputDecoration(
-        labelText: label,
+        labelText: widget.label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
-          onPressed: toggle,
+          icon: Icon(!_show ? Icons.visibility_off : Icons.visibility),
+          onPressed: _toggle,
         ),
       ),
     );

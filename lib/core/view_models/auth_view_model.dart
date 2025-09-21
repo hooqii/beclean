@@ -67,10 +67,10 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<bool> logout() async {
     try {
-      final response = ApiService.deleteRequest("$_endpoint/logout");
+      final response = await ApiService.deleteRequest("$_endpoint/logout");
       await _setToken(null, null);
       notifyListeners();
-      return (await response).statusCode < 300;
+      return response.statusCode < 300;
     } catch (e, stacktrace) {
       log("Failed to logout: $e", stackTrace: stacktrace);
       return false;
@@ -146,9 +146,26 @@ class AuthViewModel extends ChangeNotifier {
         notifyListeners();
         return null;
       }
-      throw Exception(response.message);
+      return response.message;
     } catch (e, stacktrace) {
       log("Failed to update profile: $e", stackTrace: stacktrace);
+      return "Terjadi kesalahan";
+    }
+  }
+
+  Future<String?> updatePassword(String oldPassword, String newPassword) async {
+    try {
+      final response = await ApiService.putRequest(
+        "$_endpoint/update_password",
+        body: jsonEncode({
+          "passwordLama": oldPassword,
+          "passwordBaru": newPassword,
+        }),
+      );
+      if (response.statusCode < 300) return null;
+      return response.message;
+    } catch (e, stacktrace) {
+      log("Failed to update password: $e", stackTrace: stacktrace);
       return "Terjadi kesalahan";
     }
   }
