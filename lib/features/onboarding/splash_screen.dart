@@ -1,5 +1,7 @@
 import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -10,12 +12,29 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  void _checkToken() async {
+    final authVM = context.read<AuthViewModel>();
+    final navigator = Navigator.of(context);
+    String route = AppRoutes.login;
+
+    await Future.wait([
+      authVM.loadProfile(),
+      Future.delayed(Duration(seconds: 2)),
+    ]);
+    if (authVM.role == "user") {
+      route = AppRoutes.homeUser;
+    }
+    if (authVM.role == "driver") {
+      route = AppRoutes.homeCollector;
+    }
+
+    navigator.pushReplacementNamed(route);
+  }
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
-    });
+    _checkToken();
   }
 
   @override

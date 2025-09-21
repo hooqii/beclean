@@ -6,7 +6,7 @@ import 'routes/app_routes.dart';
 import 'core/config/app_colors.dart';
 
 void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Biar status bar & nav bar transparan full edge-to-edge
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);

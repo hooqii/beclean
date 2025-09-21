@@ -76,6 +76,63 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  Future<User> getProfile() async {
+    try {
+      final response = await ApiService.getRequest("$_endpoint/profile");
+      if (response.statusCode < 300) {
+        final user = User.fromJson(response.data);
+        _currentUser = user;
+        notifyListeners();
+        return user;
+      }
+      await logout();
+      throw Exception(response.message);
+    } catch (e, stacktrace) {
+      log("Failed to get profile: $e", stackTrace: stacktrace);
+      rethrow;
+    }
+  }
+
+  Future<Collector> getCollectorProfile() async {
+    try {
+      final endpoint = "${ApiService.baseUrl}/driver/profile";
+      final response = await ApiService.getRequest(endpoint);
+      if (response.statusCode < 300) {
+        final collector = Collector.fromJson(response.data);
+        _currentCollector = collector;
+        notifyListeners();
+        return collector;
+      }
+      await logout();
+      throw Exception(response.message);
+    } catch (e, stacktrace) {
+      log("Failed to get profile: $e", stackTrace: stacktrace);
+      rethrow;
+    }
+  }
+
+  Future<bool> loadProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      ApiService.token = prefs.getString("TOKEN");
+      ApiService.role = prefs.getString("ROLE");
+      log("TOKEN: $token");
+      log("ROLE: $role");
+      notifyListeners();
+
+      if (token == null || role == null) return true;
+      if (role == "user") {
+        await getProfile();
+      } else {
+        await getCollectorProfile();
+      }
+      return true;
+    } catch (e, stacktrace) {
+      log("Failed to load profile: $e", stackTrace: stacktrace);
+      return false;
+    }
+  }
+
   Future _setToken(String? token, String? role) async {
     ApiService.token = token;
     ApiService.role = role;
