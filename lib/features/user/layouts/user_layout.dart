@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/features/user/product/view_models/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../home/views/user_home_page.dart';
@@ -34,6 +35,12 @@ class _UserLayoutState extends State<UserLayout> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<ProductViewModel>().getProducts();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // extendBody: true,
@@ -56,7 +63,7 @@ class _UserLayoutState extends State<UserLayout> {
             ),
             child: BottomNavigationBar(
               currentIndex: _selectedIndex,
-              selectedItemColor: Color.fromARGB(255, 23, 87, 14),
+              selectedItemColor: const Color.fromARGB(255, 23, 87, 14),
               // unselectedItemColor: const Color.fromARGB(255, 15, 195, 30),
               showSelectedLabels: true, // sembunyikan label saat aktif
               showUnselectedLabels: false,

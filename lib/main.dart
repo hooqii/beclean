@@ -1,4 +1,5 @@
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/features/user/product/view_models/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +33,7 @@ class BeCleanApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthViewModel()),
+        ChangeNotifierProvider(create: (context) => ProductViewModel()),
       ],
       child: MaterialApp(
         title: 'BeClean',
