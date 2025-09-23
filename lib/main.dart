@@ -1,7 +1,10 @@
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
 import 'package:beclean/features/user/product/view_models/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
 import 'core/config/app_colors.dart';
@@ -22,6 +25,9 @@ void main() {
     ),
   );
 
+  Intl.defaultLocale = "id_ID";
+  initializeDateFormatting("id_ID");
+
   runApp(const BeCleanApp());
 }
 
@@ -34,6 +40,7 @@ class BeCleanApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthViewModel()),
         ChangeNotifierProvider(create: (context) => ProductViewModel()),
+        ChangeNotifierProvider(create: (context) => ScheduleViewModel()),
       ],
       child: MaterialApp(
         title: 'BeClean',

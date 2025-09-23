@@ -49,7 +49,13 @@ class AppRoutes {
       profileUser: (context) => const ProfilePage(),
       pickupAddress: (context) => const HistoryPage(),
       homeCollector: (context) => const CollectorHomePage(),
-      pickupScheduleUser: (context) => const UserPickupSchedulePage(),
+      pickupScheduleUser: (context) {
+        final args =
+            ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+        return UserPickupSchedulePage(
+          title: args?["title"],
+        );
+      },
       pickupScheduleCollector: (context) => const CollectorPickupSchedulePage(),
       userPickupList: (context) => const UserPickupListPage(),
       collectorHistory: (context) => const CollectorHistoryPage(),

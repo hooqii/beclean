@@ -1,3 +1,4 @@
+import 'package:beclean/core/config/app_colors.dart';
 import 'package:beclean/core/utils/app_helpers.dart';
 import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:beclean/features/user/home/views/home_carousel.dart';
@@ -88,7 +89,8 @@ class UserHomePage extends StatelessWidget {
                               title: 'Riwayat Daur Ulang',
                               onTap: () => Navigator.pushNamed(
                                 context,
-                                AppRoutes.pickupAddress,
+                                AppRoutes.pickupScheduleUser,
+                                arguments: {"title": 'Riwayat Daur Ulang'},
                               ),
                             ),
                           ),
@@ -136,10 +138,10 @@ class UserHomePage extends StatelessWidget {
             bottom: 18,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white24,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white30,
               width: 1.5,
             ),
           ),
@@ -169,7 +171,7 @@ class UserHomePage extends StatelessWidget {
                       children: [
                         const Text(
                           'Halo,',
-                          style: const TextStyle(color: Colors.white70),
+                          style: TextStyle(color: Colors.white70),
                         ),
                         Text(
                           user.nama,
@@ -275,7 +277,7 @@ class UserHomePage extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.35),
+                      backgroundColor: Colors.white38,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -311,7 +313,7 @@ class UserHomePage extends StatelessWidget {
               color: const Color.fromRGBO(255, 255, 255, 1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color.fromARGB(255, 25, 109, 3).withOpacity(0.3),
+                color: AppColors.primaryDark.withAlpha(80),
                 width: 1.5,
               ),
             ),
@@ -383,7 +385,7 @@ class UserHomePage extends StatelessWidget {
               color: const Color.fromARGB(255, 255, 255, 255),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color.fromARGB(255, 23, 87, 14).withOpacity(0.3),
+                color: AppColors.primaryDark.withAlpha(80),
                 width: 1.5,
               ),
             ),

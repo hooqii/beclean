@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
 import 'package:beclean/features/user/product/view_models/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,7 @@ class _UserLayoutState extends State<UserLayout> {
   void initState() {
     super.initState();
     context.read<ProductViewModel>().getProducts();
+    context.read<ScheduleViewModel>().getSchedule();
   }
 
   @override
