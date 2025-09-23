@@ -43,4 +43,8 @@ class MutationViewModel extends ChangeNotifier {
       return "Terjadi kesalahan";
     }
   }
+
+  void onLogout() {
+    _activities = [];
+  }
 }

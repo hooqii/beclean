@@ -4,9 +4,12 @@ import 'dart:developer';
 import 'package:beclean/core/models/collector.dart';
 import 'package:beclean/core/models/user.dart';
 import 'package:beclean/core/services/api_service.dart';
+import 'package:beclean/core/view_models/mutation_view_model.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
 import 'package:beclean/features/auth/models/new_user.dart';
 import 'package:beclean/features/user/profile/models/account_details.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -14,6 +17,7 @@ class AuthViewModel extends ChangeNotifier {
 
   User? _currentUser;
   Collector? _currentCollector;
+  BuildContext? _context;
 
   User? get currentUser => _currentUser;
   Collector? get currentCollector => _currentCollector;
@@ -65,10 +69,12 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> logout() async {
+  Future<bool> logout({BuildContext? context}) async {
+    _context = context;
     try {
       final response = await ApiService.deleteRequest("$_endpoint/logout");
       await _setToken(null, null);
+      _resetViewModelData();
       notifyListeners();
       return response.statusCode < 300;
     } catch (e, stacktrace) {
@@ -184,5 +190,11 @@ class AuthViewModel extends ChangeNotifier {
     } else {
       prefs.setString("ROLE", role);
     }
+  }
+
+  void _resetViewModelData() {
+    _context?.read<MutationViewModel>().onLogout();
+    _context?.read<ScheduleViewModel>().onLogout();
+    _context = null;
   }
 }

@@ -1,10 +1,12 @@
 import 'package:beclean/core/config/app_colors.dart';
 import 'package:beclean/core/utils/app_helpers.dart';
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
 import 'package:beclean/features/user/home/views/home_carousel.dart';
 import 'package:beclean/features/user/profile/views/detail_account_user_page.dart';
 import 'package:beclean/features/user/withdraw/views/withdraw_page.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../../../../routes/app_routes.dart';
@@ -273,7 +275,7 @@ class UserHomePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    child: const Text('Cairkan'),
+                    child: const Text('Tarik Saldo'),
                   ),
                 ],
               ),
@@ -285,6 +287,11 @@ class UserHomePage extends StatelessWidget {
   }
 
   Widget _buildActiveScheduleCard(BuildContext context) {
+    final nextDate = context.read<ScheduleViewModel>().nextSchedule;
+    final nextDateString = nextDate != null
+        ? DateFormat("dd MMMM yyyy").format(nextDate)
+        : null;
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, AppRoutes.pickupScheduleUser);
@@ -318,11 +325,11 @@ class UserHomePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Jadwal pickup sampah',
                         style: TextStyle(
                           color: Color.fromARGB(255, 23, 87, 14),
@@ -330,10 +337,10 @@ class UserHomePage extends StatelessWidget {
                           fontSize: 16,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Pengangkutan: 10 Agustus 2025',
-                        style: TextStyle(
+                        'Pengangkutan: ${nextDateString ?? "-"}',
+                        style: const TextStyle(
                           color: Color.fromARGB(255, 83, 148, 14),
                           fontSize: 14,
                         ),

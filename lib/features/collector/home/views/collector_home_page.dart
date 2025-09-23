@@ -1,19 +1,33 @@
 import 'dart:ui';
+import 'package:beclean/core/config/app_colors.dart';
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../../routes/app_routes.dart';
 
-class CollectorHomePage extends StatelessWidget {
+class CollectorHomePage extends StatefulWidget {
   const CollectorHomePage({super.key});
 
+  @override
+  State<CollectorHomePage> createState() => _CollectorHomePageState();
+}
+
+class _CollectorHomePageState extends State<CollectorHomePage> {
   void _logout(BuildContext context) {
-    context.read<AuthViewModel>().logout();
+    context.read<AuthViewModel>().logout(context: context);
     Navigator.pushNamedAndRemoveUntil(
       context,
       AppRoutes.login,
       (route) => false,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ScheduleViewModel>().getScheduleCollector();
   }
 
   @override
@@ -72,7 +86,7 @@ class CollectorHomePage extends StatelessWidget {
                     const Text(
                       'Menu Collector',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 23, 87, 14),
+                        color: AppColors.primaryDark,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -124,16 +138,13 @@ class CollectorHomePage extends StatelessWidget {
                     const Text(
                       'Jadwal pickup hari ini',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 23, 87, 14),
+                        color: AppColors.primaryDark,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildPickupList([
-                      'Pukul - 09:00',
-                      'Pukul - 16:00',
-                    ]),
+                    _buildPickupList(),
                   ],
                 ),
               ),
@@ -147,6 +158,8 @@ class CollectorHomePage extends StatelessWidget {
 
   // HEADER WIDGET
   Widget _buildHeader(BuildContext context) {
+    final nama = context.read<AuthViewModel>().currentCollector!.nama;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -166,17 +179,20 @@ class CollectorHomePage extends StatelessWidget {
               const CircleAvatar(
                 radius: 25,
                 backgroundImage: AssetImage('assets/images/person.png'),
-                backgroundColor: Colors.green,
+                backgroundColor: Color.fromARGB(255, 21, 56, 21),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Halo,', style: TextStyle(color: Colors.white70)),
+                    const Text(
+                      'Halo,',
+                      style: TextStyle(color: Colors.white70),
+                    ),
                     Text(
-                      'Collector Brandon',
-                      style: TextStyle(
+                      nama,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -198,6 +214,11 @@ class CollectorHomePage extends StatelessWidget {
 
   // CARD: Jadwal Hari Ini
   Widget _buildScheduleCard(BuildContext context) {
+    final nextDate = context.read<ScheduleViewModel>().nextSchedule;
+    final nextDateString = nextDate != null
+        ? DateFormat("dd MMMM yyyy - HH:mm").format(nextDate)
+        : null;
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, AppRoutes.pickupScheduleCollector);
@@ -208,7 +229,7 @@ class CollectorHomePage extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color.fromARGB(255, 23, 87, 14).withOpacity(0.3),
+            color: AppColors.primaryDark.withOpacity(0.3),
             width: 1.5,
           ),
         ),
@@ -227,22 +248,22 @@ class CollectorHomePage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Kalender jadwal pickup',
                     style: TextStyle(
-                      color: Color.fromARGB(255, 23, 87, 14),
+                      color: AppColors.primaryDark,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    '23 September 2025 - 08:00',
-                    style: TextStyle(
+                    nextDateString ?? "-",
+                    style: const TextStyle(
                       color: Color.fromARGB(255, 83, 148, 14),
                       fontSize: 14,
                     ),
@@ -253,7 +274,7 @@ class CollectorHomePage extends StatelessWidget {
             const Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: Color.fromARGB(255, 23, 87, 14),
+              color: AppColors.primaryDark,
             ),
           ],
         ),
@@ -275,7 +296,7 @@ class CollectorHomePage extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color.fromARGB(255, 23, 87, 14).withOpacity(0.3),
+            color: AppColors.primaryDark.withOpacity(0.3),
             width: 1.5,
           ),
         ),
@@ -289,7 +310,7 @@ class CollectorHomePage extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  color: Color.fromARGB(255, 23, 87, 14),
+                  color: AppColors.primaryDark,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -301,28 +322,44 @@ class CollectorHomePage extends StatelessWidget {
   }
 
   // LIST JADWAL PENJEMPUTAN
-  Widget _buildPickupList(List<String> schedules) {
+  Widget _buildPickupList() {
+    final schedules = context.read<ScheduleViewModel>().todaySchedule;
+
+    if (schedules.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 24),
+        child: Center(
+          child: Text(
+            "Tidak ada jadwal hari ini",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
     return Column(
       children: schedules.map((schedule) {
+        final hourString = DateFormat("HH:mm").format(schedule.tanggal);
+
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 6),
           color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: const BorderSide(
-              color: Color.fromARGB(255, 23, 87, 14),
+              color: AppColors.primaryDark,
               width: 0.8,
             ),
           ),
           child: ListTile(
             leading: const Icon(
               Icons.access_time,
-              color: Color.fromARGB(255, 23, 87, 14),
+              color: AppColors.primaryDark,
             ),
             title: Text(
-              schedule,
+              "Pukul - $hourString",
               style: const TextStyle(
-                color: Color.fromARGB(255, 23, 87, 14),
+                color: AppColors.primaryDark,
                 fontWeight: FontWeight.w500,
               ),
             ),

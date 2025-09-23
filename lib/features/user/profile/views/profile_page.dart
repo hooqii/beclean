@@ -10,7 +10,7 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   void _logout(BuildContext context) {
-    context.read<AuthViewModel>().logout();
+    context.read<AuthViewModel>().logout(context: context);
     Navigator.pushNamedAndRemoveUntil(
       context,
       AppRoutes.login,
