@@ -1,15 +1,15 @@
+import 'package:beclean/core/models/payment_account.dart';
+import 'package:beclean/core/utils/app_helpers.dart';
+import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/core/view_models/mutation_view_model.dart';
+import 'package:beclean/shared/widgets/error_view.dart';
+import 'package:beclean/shared/widgets/glass_button.dart';
 import 'package:flutter/material.dart';
 import 'package:beclean/core/config/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class WithdrawPage extends StatefulWidget {
-  final List<Map<String, String>> accounts;
-  final int balance;
-
-  const WithdrawPage({
-    super.key,
-    required this.accounts,
-    required this.balance,
-  });
+  const WithdrawPage({super.key});
 
   @override
   State<WithdrawPage> createState() => _WithdrawPageState();
@@ -17,11 +17,58 @@ class WithdrawPage extends StatefulWidget {
 
 class _WithdrawPageState extends State<WithdrawPage> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedAccount;
   final _amountController = TextEditingController();
+
+  PaymentAccount? _selectedAccount;
+  bool _loading = false;
+  String? _error;
+
+  void _withdraw() async {
+    if (!_formKey.currentState!.validate()) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final mutationVM = context.read<MutationViewModel>();
+    final authVM = context.read<AuthViewModel>();
+
+    final jumlah = int.parse(_amountController.text);
+    final rekening = _selectedAccount!.id;
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final error = await mutationVM.withdraw(rekening, jumlah);
+
+    if (error == null) {
+      await authVM.getProfile();
+      final display =
+          "${_selectedAccount!.merchant.name} - ${_selectedAccount!.nomor}";
+      final jumlahString = AppHelpers.formatHarga(jumlah);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            "Pencairan $jumlahString berhasil dikirim ke $display",
+          ),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+
+      return navigator.pop();
+    }
+
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final user = context.read<AuthViewModel>().currentUser!;
+    final balance = user.saldo;
+    final accounts = user.rekening;
+    final balanceString = AppHelpers.formatHarga(balance);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -42,7 +89,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
             children: [
               /// Saldo info
               Text(
-                "Saldo Tersedia: Rp ${widget.balance}",
+                "Saldo Tersedia: $balanceString",
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -51,8 +98,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
               ),
               const SizedBox(height: 20),
 
+              /// Error View
+              Center(child: ErrorView(error: _error)),
+
               /// Dropdown pilih akun
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField<PaymentAccount>(
                 isExpanded: true,
                 value: _selectedAccount,
                 decoration: InputDecoration(
@@ -61,9 +111,12 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                items: widget.accounts.map((acc) {
-                  final display = "${acc['provider']} - ${acc['number']}";
-                  return DropdownMenuItem(value: display, child: Text(display));
+                items: accounts.map((acc) {
+                  final display = "${acc.merchant.name} - ${acc.nomor}";
+                  return DropdownMenuItem(
+                    value: acc,
+                    child: Text(display),
+                  );
                 }).toList(),
                 onChanged: (value) => setState(() {
                   _selectedAccount = value;
@@ -85,7 +138,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   suffixIcon: TextButton(
                     onPressed: () {
                       setState(() {
-                        _amountController.text = widget.balance.toString();
+                        _amountController.text = balanceString;
                       });
                     },
                     child: const Text(
@@ -103,7 +156,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   }
                   final amount = int.tryParse(value) ?? 0;
                   if (amount <= 0) return "Jumlah tidak valid";
-                  if (amount > widget.balance) {
+                  if (amount > balance) {
                     return "Saldo tidak mencukupi";
                   }
                   return null;
@@ -112,37 +165,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
               const SizedBox(height: 30),
 
               /// Tombol Cairkan
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final amount = int.parse(_amountController.text);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "Pencairan Rp $amount berhasil dikirim ke $_selectedAccount",
-                          ),
-                          backgroundColor: AppColors.primary,
-                        ),
-                      );
-
-                      Navigator.pop(context); // kembali ke home
-                    }
-                  },
-                  child: const Text(
-                    "Cairkan",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+              GlassButton(
+                onPressed: _withdraw,
+                text: "Tarik Saldo",
+                loading: _loading,
               ),
             ],
           ),

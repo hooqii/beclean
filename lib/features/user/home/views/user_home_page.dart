@@ -258,21 +258,7 @@ class UserHomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const WithdrawPage(
-                            accounts: [
-                              {
-                                "type": "Bank",
-                                "provider": "BCA",
-                                "number": "12345678",
-                              },
-                              {
-                                "type": "E-Wallet",
-                                "provider": "Dana",
-                                "number": "0812345678",
-                              },
-                            ],
-                            balance: 20000, // saldo user
-                          ),
+                          builder: (context) => const WithdrawPage(),
                         ),
                       );
                     },
