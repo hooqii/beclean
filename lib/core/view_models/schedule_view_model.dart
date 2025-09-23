@@ -60,7 +60,7 @@ class ScheduleViewModel extends ChangeNotifier {
       }
       throw Exception(response.message);
     } catch (e, stacktrace) {
-      log("Failed to register: $e", stackTrace: stacktrace);
+      log("Failed to get schedule: $e", stackTrace: stacktrace);
       return "Terjadi kesalahan";
     }
   }

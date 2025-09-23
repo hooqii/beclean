@@ -1,41 +1,31 @@
+import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/features/user/pickup_schedule/models/pickup_schedule.dart';
+import 'package:beclean/shared/widgets/collector_schedule_item.dart';
 import 'package:flutter/material.dart';
 
 class AllHistoryPage extends StatefulWidget {
-  final Map<DateTime, List<Map<String, dynamic>>> historyEvents;
-  const AllHistoryPage({super.key, required this.historyEvents});
+  final List<PickupSchedule> events;
+  const AllHistoryPage({super.key, required this.events});
   @override
   State<AllHistoryPage> createState() => _AllHistoryPageState();
 }
 
 class _AllHistoryPageState extends State<AllHistoryPage> {
-  late List<Map<String, dynamic>> allEvents;
-  late List<Map<String, dynamic>> filteredEvents;
+  late List<PickupSchedule> filteredEvents;
   final TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    // Flatten Map ke List semua event
-    allEvents = widget.historyEvents.entries
-        .expand(
-          (entry) => entry.value.map(
-            (event) => {
-              "name": event["name"],
-              "date": event["date"],
-              "weight": event["weight"],
-            },
-          ),
-        )
-        .toList();
-    filteredEvents = allEvents;
+    filteredEvents = widget.events;
     searchController.addListener(_filterEvents);
   }
 
   void _filterEvents() {
     final query = searchController.text.toLowerCase();
     setState(() {
-      filteredEvents = allEvents.where((event) {
-        final name = event["name"].toString().toLowerCase();
-        final date = event["date"].toString().toLowerCase();
+      filteredEvents = widget.events.where((event) {
+        final name = event.nama.toString().toLowerCase();
+        final date = event.tanggalString.toString().toLowerCase();
         return name.contains(query) || date.contains(query);
       }).toList();
     });
@@ -55,12 +45,12 @@ class _AllHistoryPageState extends State<AllHistoryPage> {
         title: const Text(
           "Semua Riwayat",
           style: TextStyle(
-            color: Color.fromARGB(255, 23, 87, 14),
+            color: AppColors.primaryDark,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
+        iconTheme: const IconThemeData(color: AppColors.primaryDark),
       ),
       body: Column(
         children: [
@@ -93,7 +83,7 @@ class _AllHistoryPageState extends State<AllHistoryPage> {
                     child: Text(
                       "Tidak ada riwayat yang cocok.",
                       style: TextStyle(
-                        color: Color.fromARGB(255, 23, 87, 14),
+                        color: AppColors.primaryDark,
                         fontSize: 14,
                       ),
                     ),
@@ -103,50 +93,7 @@ class _AllHistoryPageState extends State<AllHistoryPage> {
                     itemCount: filteredEvents.length,
                     itemBuilder: (context, index) {
                       final item = filteredEvents[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color.fromARGB(255, 23, 87, 14),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              23,
-                              87,
-                              14,
-                            ).withOpacity(0.1),
-                            child: const Icon(
-                              Icons.history,
-                              color: Color.fromARGB(255, 23, 87, 14),
-                            ),
-                          ),
-                          title: Text(
-                            item["name"],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 23, 87, 14),
-                            ),
-                          ),
-                          subtitle: Text(
-                            "Tanggal: ${item["date"]}",
-                            style: const TextStyle(
-                              color: Color.fromARGB(255, 23, 87, 14),
-                            ),
-                          ),
-                          trailing: Text(
-                            "${item["weight"]} kg",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 23, 87, 14),
-                            ),
-                          ),
-                        ),
-                      );
+                      return CollectorScheduleItem(item: item);
                     },
                   ),
           ),

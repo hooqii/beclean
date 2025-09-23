@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:beclean/core/config/app_colors.dart';
 import 'package:beclean/core/view_models/auth_view_model.dart';
 import 'package:beclean/core/view_models/schedule_view_model.dart';
+import 'package:beclean/features/user/product/view_models/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,7 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
   void initState() {
     super.initState();
     context.read<ScheduleViewModel>().getScheduleCollector();
+    context.read<ProductViewModel>().getProducts();
   }
 
   @override
@@ -167,10 +169,10 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white24,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white30,
               width: 1.5,
             ),
           ),
@@ -214,7 +216,7 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
 
   // CARD: Jadwal Hari Ini
   Widget _buildScheduleCard(BuildContext context) {
-    final nextDate = context.read<ScheduleViewModel>().nextSchedule;
+    final nextDate = context.watch<ScheduleViewModel>().nextSchedule;
     final nextDateString = nextDate != null
         ? DateFormat("dd MMMM yyyy - HH:mm").format(nextDate)
         : null;
@@ -229,7 +231,7 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppColors.primaryDark.withOpacity(0.3),
+            color: AppColors.primaryDark.withAlpha(80),
             width: 1.5,
           ),
         ),
@@ -296,7 +298,7 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppColors.primaryDark.withOpacity(0.3),
+            color: AppColors.primaryDark.withAlpha(80),
             width: 1.5,
           ),
         ),
@@ -323,7 +325,7 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
 
   // LIST JADWAL PENJEMPUTAN
   Widget _buildPickupList() {
-    final schedules = context.read<ScheduleViewModel>().todaySchedule;
+    final schedules = context.watch<ScheduleViewModel>().todaySchedule;
 
     if (schedules.isEmpty) {
       return const Padding(

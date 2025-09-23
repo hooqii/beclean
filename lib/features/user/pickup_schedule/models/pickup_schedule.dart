@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 
 class PickupSchedule {
   final DateTime tanggal;
+  final String nama;
   final ScheduleDetail? details;
 
   PickupSchedule({
     required this.tanggal,
+    required this.nama,
     required this.details,
   });
 
@@ -40,6 +42,7 @@ class PickupSchedule {
 
     return PickupSchedule(
       tanggal: DateTime.parse(json["tanggal"]),
+      nama: json["nama"],
       details: details != null ? ScheduleDetail.fromJson(details) : null,
     );
   }

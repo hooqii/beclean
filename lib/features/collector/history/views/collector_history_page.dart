@@ -159,13 +159,13 @@ class _CollectorHistoryPageState extends State<CollectorHistoryPage> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        AllHistoryPage(historyEvents: _historyEvents),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) =>
+                //         AllHistoryPage(historyEvents: _historyEvents),
+                //   ),
+                // );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 23, 87, 14),

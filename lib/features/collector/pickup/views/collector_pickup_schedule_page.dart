@@ -1,4 +1,9 @@
+import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
+import 'package:beclean/features/collector/history/views/all_history_page.dart';
+import 'package:beclean/shared/widgets/collector_schedule_item.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 /// 🔹 Helper class untuk dialog input berat sampah
@@ -39,7 +44,7 @@ class PickupDialogHelper {
                 "Input Berat Sampah",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 23, 87, 14),
+                  color: AppColors.primaryDark,
                 ),
               ),
               content: SizedBox(
@@ -65,7 +70,7 @@ class PickupDialogHelper {
                           ),
                           Switch(
                             value: isOrganikOnly,
-                            activeColor: const Color.fromARGB(255, 23, 87, 14),
+                            activeColor: AppColors.primaryDark,
                             onChanged: (value) {
                               setState(() {
                                 isOrganikOnly = value;
@@ -96,7 +101,7 @@ class PickupDialogHelper {
                             color: const Color.fromARGB(20, 23, 87, 14),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: const Color.fromARGB(255, 23, 87, 14),
+                              color: AppColors.primaryDark,
                               width: 1,
                             ),
                           ),
@@ -108,7 +113,7 @@ class PickupDialogHelper {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 23, 87, 14),
+                                  color: AppColors.primaryDark,
                                 ),
                               ),
                               Text(
@@ -163,7 +168,7 @@ class PickupDialogHelper {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 23, 87, 14),
+                    backgroundColor: AppColors.primaryDark,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -215,39 +220,20 @@ class _CollectorPickupSchedulePageState
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  final Map<DateTime, List<Map<String, String>>> _pickupEvents = {
-    DateTime.utc(2025, 9, 13): [
-      {"name": "Steven Brenz", "time": "09:00"},
-      {"name": "Anna Putri", "time": "16:00"},
-    ],
-    DateTime.utc(2025, 9, 15): [
-      {"name": "Budi Santoso", "time": "13:00"},
-    ],
-    DateTime.utc(2025, 9, 17): [
-      {"name": "Dewi Lestari", "time": "20:00"},
-    ],
-    DateTime.utc(2025, 9, 20): [
-      {"name": "Steven Brenz", "time": "09:00"},
-      {"name": "Andi Wijaya", "time": "20:00"},
-    ],
-  };
-
-  List<Map<String, String>> _getEventsForDay(DateTime day) {
-    return _pickupEvents[DateTime.utc(day.year, day.month, day.day)] ?? [];
-  }
-
   @override
   Widget build(BuildContext context) {
-    final events = _getEventsForDay(_selectedDay ?? _focusedDay);
+    final getEventsForDay = context.read<ScheduleViewModel>().getEventsForDay;
+    final events = getEventsForDay(_selectedDay ?? _focusedDay);
+    final preview = events.length > 3 ? events.sublist(0, 3) : events;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Jadwal Pickup',
-          style: TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
+          style: TextStyle(color: AppColors.primaryDark),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
+        iconTheme: const IconThemeData(color: AppColors.primaryDark),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -259,7 +245,7 @@ class _CollectorPickupSchedulePageState
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            eventLoader: _getEventsForDay,
+            eventLoader: getEventsForDay,
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
@@ -277,15 +263,15 @@ class _CollectorPickupSchedulePageState
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
-              titleTextStyle: TextStyle(color: Color.fromARGB(255, 23, 87, 14)),
+              titleTextStyle: TextStyle(color: AppColors.primaryDark),
             ),
-            calendarStyle: const CalendarStyle(
-              selectedDecoration: BoxDecoration(
-                color: Color.fromARGB(255, 23, 87, 14),
+            calendarStyle: CalendarStyle(
+              selectedDecoration: const BoxDecoration(
+                color: AppColors.primaryDark,
                 shape: BoxShape.circle,
               ),
               todayDecoration: BoxDecoration(
-                color: Color.fromARGB(100, 23, 87, 14),
+                color: AppColors.primaryDark.withAlpha(100),
                 shape: BoxShape.circle,
               ),
               outsideDaysVisible: false,
@@ -298,76 +284,45 @@ class _CollectorPickupSchedulePageState
                     child: Text(
                       'Tidak ada jadwal pickup untuk hari ini.',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 23, 87, 14),
+                        color: AppColors.primaryDark,
                         fontSize: 14,
                       ),
                     ),
                   )
                 : ListView.builder(
-                    itemCount: events.length,
+                    itemCount: preview.length,
                     itemBuilder: (context, index) {
-                      final item = events[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(
-                            color: Color.fromARGB(255, 23, 87, 14),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.person,
-                            color: Color.fromARGB(255, 23, 87, 14),
-                          ),
-                          title: Text(
-                            item["name"] ?? "",
-                            style: const TextStyle(
-                              color: Color.fromARGB(255, 23, 87, 14),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          subtitle: Text(
-                            "Jam Pickup: ${item["time"]}",
-                            style: const TextStyle(
-                              color: Color.fromARGB(255, 23, 87, 14),
-                            ),
-                          ),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              PickupDialogHelper.showInputWeightDialog(
-                                context,
-                                item["name"] ?? "",
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                23,
-                                87,
-                                14,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                            ),
-                            child: const Text(
-                              "Proses",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      );
+                      final item = preview[index];
+                      return CollectorScheduleItem(item: item);
                     },
                   ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return AllHistoryPage(events: events);
+                    },
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 23, 87, 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size(double.infinity, 48),
+              ),
+              icon: const Icon(Icons.list, color: Colors.white),
+              label: const Text(
+                "Selengkapnya",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ],
       ),
