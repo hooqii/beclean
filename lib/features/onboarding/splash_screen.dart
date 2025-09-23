@@ -17,15 +17,18 @@ class _SplashScreenState extends State<SplashScreen> {
     final navigator = Navigator.of(context);
     String route = AppRoutes.login;
 
-    await Future.wait([
+    final results = await Future.wait([
       authVM.loadProfile(),
-      Future.delayed(Duration(seconds: 2)),
+      Future.delayed(const Duration(seconds: 2)),
     ]);
-    if (authVM.role == "user") {
-      route = AppRoutes.homeUser;
-    }
-    if (authVM.role == "driver") {
-      route = AppRoutes.homeCollector;
+
+    if (results[0]) {
+      if (authVM.role == "user") {
+        route = AppRoutes.homeUser;
+      }
+      if (authVM.role == "driver") {
+        route = AppRoutes.homeCollector;
+      }
     }
 
     navigator.pushReplacementNamed(route);
