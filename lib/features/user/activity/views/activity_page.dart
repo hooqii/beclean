@@ -1,55 +1,14 @@
+import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/core/view_models/mutation_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ActivityPage extends StatelessWidget {
   const ActivityPage({super.key});
 
-  IconData _getIcon(String desc) {
-    if (desc.contains("Tarik")) return Icons.account_balance_wallet_outlined;
-    if (desc.contains("Setor")) return Icons.recycling_outlined;
-    return Icons.receipt_long_outlined;
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case "Proses":
-        return Colors.orange;
-      case "Selesai":
-        return Colors.green;
-      case "Gagal":
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final history = [
-      {
-        'date': '01-08-2025',
-        'desc': 'Tarik Tunai',
-        'saldo': '-Rp 50.000',
-        'status': 'Proses',
-      },
-      {
-        'date': '28-07-2025',
-        'desc': 'Setor Sampah',
-        'saldo': '+Rp 20.000',
-        'status': 'Selesai',
-      },
-      {
-        'date': '25-07-2025',
-        'desc': 'Tarik Tunai',
-        'saldo': '-Rp 100.000',
-        'status': 'Selesai',
-      },
-      {
-        'date': '20-07-2025',
-        'desc': 'Setor Sampah',
-        'saldo': '+Rp 15.000',
-        'status': 'Selesai',
-      },
-    ];
+    final activities = context.read<MutationViewModel>().activities;
 
     return Scaffold(
       appBar: AppBar(
@@ -67,9 +26,9 @@ class ActivityPage extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: history.length,
+        itemCount: activities.length,
         itemBuilder: (context, index) {
-          final h = history[index];
+          final activity = activities[index];
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -77,35 +36,33 @@ class ActivityPage extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color.fromARGB(255, 23, 87, 14).withOpacity(0.3),
+                color: AppColors.primaryDark.withAlpha(80),
                 width: 1,
               ),
             ),
             child: ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
-                backgroundColor: _getStatusColor(h['status']!).withOpacity(0.1),
+                backgroundColor: activity.color.withAlpha(30),
                 child: Icon(
-                  _getIcon(h['desc']!),
-                  color: _getStatusColor(h['status']!),
+                  activity.icon,
+                  color: activity.color,
                 ),
               ),
               title: Text(
-                h['desc']!,
+                activity.judul,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(h['date']!), // sekarang hanya tanggal
+              subtitle: Text(activity.tanggalString), // sekarang hanya tanggal
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    h['saldo']!,
+                    activity.jumlahString,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: h['saldo']!.startsWith('-')
-                          ? Colors.red
-                          : Colors.green,
+                      color: activity.jumlahColor,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -115,14 +72,14 @@ class ActivityPage extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(h['status']!).withOpacity(0.15),
+                      color: activity.color.withAlpha(60),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      h['status']!,
+                      activity.status,
                       style: TextStyle(
                         fontSize: 12,
-                        color: _getStatusColor(h['status']!),
+                        color: activity.color,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -152,13 +109,13 @@ class ActivityPage extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                _getIcon(h['desc']!),
-                                color: _getStatusColor(h['status']!),
+                                activity.icon,
+                                color: activity.color,
                                 size: 32,
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                h['desc']!,
+                                activity.judul,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -168,11 +125,19 @@ class ActivityPage extends StatelessWidget {
                           ),
                           const Divider(height: 24, thickness: 1),
                           Text(
-                            "Tanggal: ${h['date']}",
+                            "Tanggal: ${activity.tanggalString}",
                             style: const TextStyle(fontSize: 16),
                           ),
-                          Text(
-                            "Jumlah: ${h['saldo']}",
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(text: "Jumlah: "),
+                                TextSpan(
+                                  text: activity.jumlahString,
+                                  style: TextStyle(color: activity.jumlahColor),
+                                ),
+                              ],
+                            ),
                             style: const TextStyle(fontSize: 16),
                           ),
                           const SizedBox(height: 8),
@@ -182,16 +147,14 @@ class ActivityPage extends StatelessWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: _getStatusColor(
-                                h['status']!,
-                              ).withOpacity(0.15),
+                              color: activity.color.withAlpha(60),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              h['status']!,
+                              activity.status,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: _getStatusColor(h['status']!),
+                                color: activity.color,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -202,12 +165,7 @@ class ActivityPage extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: () => Navigator.pop(context),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(
-                                  255,
-                                  23,
-                                  87,
-                                  14,
-                                ),
+                                backgroundColor: AppColors.primaryDark,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),

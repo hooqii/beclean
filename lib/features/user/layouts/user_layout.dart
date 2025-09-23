@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:beclean/core/view_models/auth_view_model.dart';
+import 'package:beclean/core/view_models/mutation_view_model.dart';
 import 'package:beclean/core/view_models/schedule_view_model.dart';
 import 'package:beclean/features/user/product/view_models/product_view_model.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class _UserLayoutState extends State<UserLayout> {
     super.initState();
     context.read<ProductViewModel>().getProducts();
     context.read<ScheduleViewModel>().getSchedule();
+    context.read<MutationViewModel>().getActivities();
   }
 
   @override
@@ -56,8 +58,8 @@ class _UserLayoutState extends State<UserLayout> {
           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
             height: 70.0, // Atur ketinggian di sini
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.9),
+            decoration: const BoxDecoration(
+              color: Colors.white,
               // borderRadius: const BorderRadius.only(
               //   topLeft: Radius.circular(20.0),
               //   topRight: Radius.circular(20.0),
