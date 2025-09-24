@@ -4,13 +4,15 @@ import 'package:intl/intl.dart';
 
 class PickupSchedule {
   final DateTime tanggal;
-  final String nama;
+  final ScheduleUser user;
   final ScheduleDetail? details;
+  final String? scheduleId;
 
   PickupSchedule({
     required this.tanggal,
-    required this.nama,
+    required this.user,
     required this.details,
+    required this.scheduleId,
   });
 
   IconData get icon {
@@ -37,12 +39,18 @@ class PickupSchedule {
     return formatter.format(tanggal);
   }
 
+  String get hoursString {
+    final formatter = DateFormat("HH:mm");
+    return formatter.format(tanggal);
+  }
+
   factory PickupSchedule.fromJson(Map<String, dynamic> json) {
     final details = json["details"];
 
     return PickupSchedule(
       tanggal: DateTime.parse(json["tanggal"]),
-      nama: json["nama"],
+      user: ScheduleUser.fromJson(json["user"]),
+      scheduleId: json["idJadwal"],
       details: details != null ? ScheduleDetail.fromJson(details) : null,
     );
   }
@@ -68,6 +76,26 @@ class ScheduleDetail {
       tipe: json["tipe"],
       jumlah: json["jumlah"],
       berat: double.parse(json["berat"].toString()),
+    );
+  }
+}
+
+class ScheduleUser {
+  final String id;
+  final String nama;
+  final String alamat;
+
+  ScheduleUser({
+    required this.id,
+    required this.nama,
+    required this.alamat,
+  });
+
+  factory ScheduleUser.fromJson(Map<String, dynamic> json) {
+    return ScheduleUser(
+      id: json["id"],
+      nama: json["nama"],
+      alamat: json["alamat"],
     );
   }
 }

@@ -24,7 +24,7 @@ class _AllHistoryPageState extends State<AllHistoryPage> {
     final query = searchController.text.toLowerCase();
     setState(() {
       filteredEvents = widget.events.where((event) {
-        final name = event.nama.toString().toLowerCase();
+        final name = event.user.nama.toString().toLowerCase();
         final date = event.tanggalString.toString().toLowerCase();
         return name.contains(query) || date.contains(query);
       }).toList();

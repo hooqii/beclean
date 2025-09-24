@@ -1,4 +1,12 @@
+import 'package:beclean/core/config/app_colors.dart';
+import 'package:beclean/core/view_models/schedule_view_model.dart';
+import 'package:beclean/features/collector/pickup/models/new_pickup.dart';
+import 'package:beclean/features/user/pickup_schedule/models/pickup_schedule.dart';
+import 'package:beclean/features/user/product/models/product.dart';
+import 'package:beclean/features/user/product/view_models/product_view_model.dart';
+import 'package:beclean/shared/widgets/error_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UserPickupListPage extends StatefulWidget {
   const UserPickupListPage({super.key});
@@ -8,68 +16,48 @@ class UserPickupListPage extends StatefulWidget {
 }
 
 class _UserPickupListPageState extends State<UserPickupListPage> {
-  final List<Map<String, dynamic>> pickupList = [
-    {
-      "name": "Steven Brenz",
-      "address": "Jl. Merdeka No. 21",
-      "date": "20 Agustus 2025",
-      "time": "09:00",
-    },
-    {
-      "name": "Anna Putri",
-      "address": "Jl. Mawar No. 5",
-      "date": "19 Agustus 2025",
-      "time": "09:30",
-    },
-    {
-      "name": "Budi Santoso",
-      "address": "Jl. Kenanga No. 12",
-      "date": "20 Agustus 2025",
-      "time": "10:00",
-    },
-  ];
+  final TextEditingController _searchController = TextEditingController();
+  String _query = "";
 
-  List<Map<String, dynamic>> filteredList = [];
-  final TextEditingController searchController = TextEditingController();
+  void _filterList() {
+    String query = _searchController.text.toLowerCase();
+    setState(() => _query = query);
+  }
 
   @override
   void initState() {
     super.initState();
-    filteredList = pickupList; // awalnya semua data tampil
-    searchController.addListener(_filterList);
-  }
-
-  void _filterList() {
-    String query = searchController.text.toLowerCase();
-    setState(() {
-      filteredList = pickupList.where((item) {
-        final name = item["name"].toString().toLowerCase();
-        final address = item["address"].toString().toLowerCase();
-        return name.contains(query) || address.contains(query);
-      }).toList();
-    });
+    _searchController.addListener(_filterList);
   }
 
   @override
   void dispose() {
-    searchController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final pickupList = context.watch<ScheduleViewModel>().todaySchedule;
+
+    final filteredList = pickupList.where((item) {
+      if (_query.isEmpty) return true;
+      final name = item.user.nama.toString().toLowerCase();
+      final address = item.user.alamat.toString().toLowerCase();
+      return name.contains(_query) || address.contains(_query);
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         title: const Text(
           "Daftar Penjemputan",
           style: TextStyle(
-            color: Color.fromARGB(255, 23, 87, 14),
-            fontWeight: FontWeight.bold,
+            color: AppColors.primaryDark,
           ),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 23, 87, 14)),
+        iconTheme: const IconThemeData(color: AppColors.primaryDark),
       ),
       body: Column(
         children: [
@@ -77,7 +65,7 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
-              controller: searchController,
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Cari nama atau alamat...",
                 prefixIcon: const Icon(
@@ -96,11 +84,16 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
           ),
           // List hasil filter
           Expanded(
-            child: filteredList.isEmpty
-                ? const Center(
+            child: filteredList.isEmpty || pickupList.isEmpty
+                ? Center(
                     child: Text(
-                      "Tidak ada data yang cocok.",
-                      style: TextStyle(color: Colors.black54, fontSize: 14),
+                      pickupList.isEmpty
+                          ? "Tidak ada jadwal hari ini."
+                          : "Tidak ada data yang cocok.",
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                      ),
                     ),
                   )
                 : ListView.builder(
@@ -112,62 +105,35 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          // color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Color.fromARGB(255, 23, 87, 14),
+                            color: AppColors.primaryDark,
                             width: 0.8,
                           ),
                         ),
                         child: ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              23,
-                              87,
-                              14,
-                            ).withOpacity(0.1),
+                            backgroundColor: AppColors.primaryDark.withAlpha(
+                              30,
+                            ),
                             child: const Icon(
                               Icons.person,
-                              color: Color.fromARGB(255, 23, 87, 14),
+                              color: AppColors.primaryDark,
                             ),
                           ),
                           title: Text(
-                            item["name"],
+                            item.user.nama,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
                           ),
                           subtitle: Text(
-                            "${item["address"]}\nJam: ${item["time"]}",
+                            "${item.user.alamat}\nJam: ${item.hoursString}",
                             style: const TextStyle(color: Colors.black54),
                           ),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              _showInputWeightDialog(context, item["name"]);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(
-                                255,
-                                23,
-                                87,
-                                14,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                            ),
-                            child: const Text(
-                              "Proses",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
+                          trailing: _buildTraililng(item),
                         ),
                       );
                     },
@@ -178,196 +144,265 @@ class _UserPickupListPageState extends State<UserPickupListPage> {
     );
   }
 
-  // 🗑 Dialog input berat (tetap sama dengan versi kamu sebelumnya)
-  void _showInputWeightDialog(BuildContext context, String userName) {
-    final TextEditingController totalWeightController = TextEditingController();
-    final TextEditingController plastikController = TextEditingController();
-    final TextEditingController kertasController = TextEditingController();
-    final TextEditingController logamController = TextEditingController();
+  void _processItem(PickupSchedule schedule) {
     showDialog(
       context: context,
-      builder: (context) {
-        bool isOrganikOnly = false;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            void calculateTotal() {
-              double plastik = double.tryParse(plastikController.text) ?? 0;
-              double kertas = double.tryParse(kertasController.text) ?? 0;
-              double logam = double.tryParse(logamController.text) ?? 0;
-              double total = plastik + kertas + logam;
-              setState(() {
-                totalWeightController.text = total > 0
-                    ? total.toStringAsFixed(2)
-                    : "";
-              });
-            }
-
-            plastikController.addListener(calculateTotal);
-            kertasController.addListener(calculateTotal);
-            logamController.addListener(calculateTotal);
-
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: const Text(
-                "Input Berat Sampah",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 23, 87, 14),
-                ),
-              ),
-              content: SizedBox(
-                width: 350,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Nama: $userName",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Sampah organik semua",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          Switch(
-                            value: isOrganikOnly,
-                            activeColor: const Color.fromARGB(255, 23, 87, 14),
-                            onChanged: (value) {
-                              setState(() {
-                                isOrganikOnly = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      if (!isOrganikOnly) ...[
-                        const Text(
-                          "Detail Produk Daur Ulang:",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        _buildProductField("Plastik (kg)", plastikController),
-                        const SizedBox(height: 8),
-                        _buildProductField("Kertas (kg)", kertasController),
-                        const SizedBox(height: 8),
-                        _buildProductField("Logam (kg)", logamController),
-                        const SizedBox(height: 8),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(20, 23, 87, 14),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color.fromARGB(255, 23, 87, 14),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Total Berat:",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 23, 87, 14),
-                                ),
-                              ),
-                              Text(
-                                "${totalWeightController.text.isEmpty ? "0.00" : totalWeightController.text} kg",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Batal"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    String total = totalWeightController.text;
-                    String plastik = plastikController.text;
-                    String kertas = kertasController.text;
-                    String logam = logamController.text;
-                    String message;
-                    if (isOrganikOnly) {
-                      message =
-                          "Pickup untuk $userName berhasil disimpan (Organik semua, tanpa timbang)";
-                    } else {
-                      if (total.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Isi minimal 1 produk daur ulang dengan berat",
-                            ),
-                          ),
-                        );
-                        return;
-                      }
-                      message =
-                          "Berat produk untuk $userName:\nPlastik: ${plastik.isEmpty ? '0' : plastik} kg\nKertas: ${kertas.isEmpty ? '0' : kertas} kg\nLogam: ${logam.isEmpty ? '0' : logam} kg\nTotal: $total kg";
-                    }
-
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(message)));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 23, 87, 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    "Simpan",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (context) => _InputSampahDialog(schedule: schedule),
     );
   }
 
-  Widget _buildProductField(String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
+  Widget _buildTraililng(PickupSchedule schedule) {
+    if (schedule.details == null) {
+      return ElevatedButton(
+        onPressed: () {
+          _processItem(schedule);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryDark,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+        ),
+        child: const Text(
+          "Proses",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    return const Text(
+      "Selesai",
+      style: TextStyle(color: AppColors.primaryDark),
+    );
+  }
+}
+
+class _InputSampahDialog extends StatefulWidget {
+  const _InputSampahDialog({required this.schedule});
+  final PickupSchedule schedule;
+
+  @override
+  State<_InputSampahDialog> createState() => _InputSampahDialogState();
+}
+
+class _InputSampahDialogState extends State<_InputSampahDialog> {
+  final List<Product> _selectedProducts = [];
+  final List<TextEditingController> _controllers = [];
+
+  bool _loading = false;
+  String? _error;
+
+  List<Product> get _products {
+    final allProducts = context.read<ProductViewModel>().products;
+    final productIds = _selectedProducts.map((e) => e.id);
+    return allProducts.where((product) {
+      return !productIds.contains(product.id);
+    }).toList();
+  }
+
+  void _onChange(int index, Product product) {
+    setState(() => _selectedProducts[index] = product);
+  }
+
+  void _remove(int index) {
+    setState(() {
+      _selectedProducts.removeAt(index);
+      _controllers.removeAt(index);
+    });
+  }
+
+  void _add() {
+    if (_products.isEmpty) return;
+    setState(() {
+      _selectedProducts.add(_products[0]);
+      _controllers.add(TextEditingController());
+    });
+  }
+
+  void _processPickup() async {
+    if (_loading) return;
+    for (var controller in _controllers) {
+      if (controller.text.isEmpty) {
+        setState(() => _error = "Berat tidak boleh kosong");
+        return;
+      }
+    }
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final scheduleVM = context.read<ScheduleViewModel>();
+
+    final schedule = widget.schedule;
+    final pickups = List.generate(_selectedProducts.length, (index) {
+      final product = _selectedProducts[index];
+      final weight = double.parse(_controllers[index].text);
+
+      return NewPickup(
+        scheduleId: schedule.scheduleId!,
+        userId: schedule.user.id,
+        productId: product.id,
+        weight: weight,
+      );
+    });
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    final error = await scheduleVM.processPickup(
+      pickups,
+    );
+
+    if (error == null) {
+      final weight = pickups.fold(0.0, (v, e) => v + e.weight);
+      final message =
+          "Penjemputan sampah untuk ${schedule.user.nama} berhasil diambil dengan total berat ${weight}Kg";
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      navigator.pop();
+    }
+
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.all(24),
+      backgroundColor: Colors.white,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Input Berat Sampah",
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontSize: 24,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text("Nama: ${widget.schedule.user.nama}"),
+              const SizedBox(height: 24),
+              const Center(
+                child: Text(
+                  "Sudah termasuk sampah organik",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              Center(child: ErrorView(error: _error)),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _selectedProducts.length,
+                itemBuilder: (context, index) {
+                  final product = _selectedProducts[index];
+                  final controller = _controllers[index];
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: InkWell(
+                      onTap: () => _remove(index),
+                      borderRadius: BorderRadius.circular(999),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.remove,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButton(
+                            padding: EdgeInsets.zero,
+                            value: product,
+                            onChanged: (value) => _onChange(index, value!),
+                            items: _buildDropdownItems(product),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 70,
+                          child: TextField(
+                            controller: controller,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              hintText: "(Kg)",
+                              hintStyle: TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              Center(
+                child: TextButton(
+                  onPressed: _add,
+                  child: const Text(
+                    "+ Tambah",
+                    style: TextStyle(color: AppColors.primaryDark),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 48),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Batal"),
+                  ),
+                  ElevatedButton(
+                    onPressed: _processPickup,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _loading
+                          ? AppColors.primaryDark.withAlpha(125)
+                          : AppColors.primaryDark,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Simpan",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  List<DropdownMenuItem> _buildDropdownItems(Product product) {
+    final products = [product, ..._products];
+    return products.map((item) {
+      return DropdownMenuItem(
+        value: item,
+        child: Text(
+          item.nama,
+          style: const TextStyle(fontSize: 14),
+        ),
+      );
+    }).toList();
   }
 }

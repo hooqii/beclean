@@ -343,26 +343,28 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
     return Column(
       children: schedules.map((schedule) {
         final hourString = DateFormat("HH:mm").format(schedule.tanggal);
+        final done = schedule.details != null;
+        final color = done ? Colors.grey : AppColors.primaryDark;
 
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 6),
           color: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(
-              color: AppColors.primaryDark,
+            side: BorderSide(
+              color: color,
               width: 0.8,
             ),
           ),
           child: ListTile(
-            leading: const Icon(
+            leading: Icon(
               Icons.access_time,
-              color: AppColors.primaryDark,
+              color: color,
             ),
             title: Text(
               "Pukul - $hourString",
-              style: const TextStyle(
-                color: AppColors.primaryDark,
+              style: TextStyle(
+                color: color,
                 fontWeight: FontWeight.w500,
               ),
             ),

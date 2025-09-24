@@ -17,7 +17,7 @@ class CollectorScheduleItem extends StatelessWidget {
         ),
       ),
       title: Text(
-        item.nama,
+        item.user.nama,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: AppColors.primaryDark,

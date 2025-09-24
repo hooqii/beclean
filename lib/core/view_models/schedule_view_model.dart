@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:beclean/core/services/api_service.dart';
+import 'package:beclean/features/collector/pickup/models/new_pickup.dart';
 import 'package:beclean/features/user/pickup_schedule/models/pickup_schedule.dart';
 import 'package:flutter/material.dart';
 
@@ -56,6 +58,25 @@ class ScheduleViewModel extends ChangeNotifier {
         final json = response.data as List;
         _pickupEvents = json.map((e) => PickupSchedule.fromJson(e)).toList();
         notifyListeners();
+        return null;
+      }
+      throw Exception(response.message);
+    } catch (e, stacktrace) {
+      log("Failed to get schedule: $e", stackTrace: stacktrace);
+      return "Terjadi kesalahan";
+    }
+  }
+
+  Future<String?> processPickup(List<NewPickup> pickups) async {
+    try {
+      const endpoint = "${ApiService.baseUrl}/detail_jadwal/add_many";
+      final pickupsMap = pickups.map((e) => e.toMap()).toList();
+      final response = await ApiService.postRequest(
+        endpoint,
+        body: jsonEncode({"setoran": pickupsMap}),
+      );
+      if (response.statusCode < 300) {
+        getScheduleCollector();
         return null;
       }
       throw Exception(response.message);
