@@ -121,7 +121,8 @@ class _CollectorHomePageState extends State<CollectorHomePage> {
                             title: 'Riwayat Penjemputan',
                             onTap: () => Navigator.pushNamed(
                               context,
-                              AppRoutes.collectorHistory,
+                              AppRoutes.pickupScheduleCollector,
+                              arguments: {"title": 'Riwayat Penjemputan'},
                             ),
                           ),
                         ),

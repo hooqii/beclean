@@ -44,10 +44,7 @@ class _AllHistoryPageState extends State<AllHistoryPage> {
         elevation: 0,
         title: const Text(
           "Semua Riwayat",
-          style: TextStyle(
-            color: AppColors.primaryDark,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: AppColors.primaryDark),
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: AppColors.primaryDark),
@@ -77,28 +74,44 @@ class _AllHistoryPageState extends State<AllHistoryPage> {
             ),
           ),
           // 🔹 List Riwayat
-          Expanded(
-            child: filteredEvents.isEmpty
-                ? const Center(
-                    child: Text(
-                      "Tidak ada riwayat yang cocok.",
-                      style: TextStyle(
-                        color: AppColors.primaryDark,
-                        fontSize: 14,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredEvents.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredEvents[index];
-                      return CollectorScheduleItem(item: item);
-                    },
-                  ),
-          ),
+          Expanded(child: _buildScheduleListView()),
         ],
       ),
+    );
+  }
+
+  Widget _buildScheduleListView() {
+    if (widget.events.isEmpty) {
+      return const Center(
+        child: Text(
+          "Tidak ada jadwal pickup.",
+          style: TextStyle(
+            color: AppColors.primaryDark,
+            fontSize: 14,
+          ),
+        ),
+      );
+    }
+
+    if (filteredEvents.isEmpty) {
+      return const Center(
+        child: Text(
+          "Tidak ada riwayat yang cocok.",
+          style: TextStyle(
+            color: AppColors.primaryDark,
+            fontSize: 14,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: filteredEvents.length,
+      itemBuilder: (context, index) {
+        final item = filteredEvents[index];
+        return CollectorScheduleItem(item: item);
+      },
     );
   }
 }

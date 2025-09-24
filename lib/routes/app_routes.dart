@@ -56,7 +56,13 @@ class AppRoutes {
           title: args?["title"],
         );
       },
-      pickupScheduleCollector: (context) => const CollectorPickupSchedulePage(),
+      pickupScheduleCollector: (context) {
+        final args =
+            ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+        return CollectorPickupSchedulePage(
+          title: args?["title"],
+        );
+      },
       userPickupList: (context) => const UserPickupListPage(),
       collectorHistory: (context) => const CollectorHistoryPage(),
       paymentAccount: (context) {
