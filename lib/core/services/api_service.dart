@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   ApiService._();
 
-  static const String hostUrl = "http://192.168.18.14:3000";
+  static const String hostUrl = "http://zuzuzu.my.id:3002";
   static const String baseUrl = "$hostUrl/api/v1";
 
   static String? token;
